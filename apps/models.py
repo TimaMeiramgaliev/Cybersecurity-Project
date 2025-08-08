@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-
+from datetime import datetime
 from email.policy import default
 from apps import db
 from sqlalchemy.exc import SQLAlchemyError
@@ -8,32 +8,40 @@ import datetime as dt
 from sqlalchemy.orm import relationship
 from enum import Enum
 
-class CURRENCY_TYPE(Enum):
-    usd = 'usd'
-    eur = 'eur'
+class STATUS_TYPE(Enum):
+    OPEN = 'OPEN'
+    CLOSED = 'CLOSED'
 
-class Product(db.Model):
+class SeverityLevel(Enum):
+    CRITICAL = "CRITICAL"
+    MAJOR = "MAJOR"
+    MEDIUM = "MEDIUM"
+    LOW = "LOW"
 
-    __tablename__ = 'products'
+class Case(db.Model):
+    __tablename__ = 'cases'
 
-    id            = db.Column(db.Integer,      primary_key=True)
-    name          = db.Column(db.String(128),  nullable=False)
-    info          = db.Column(db.Text,         nullable=True)
-    price         = db.Column(db.Integer,      nullable=False)
-    currency      = db.Column(db.Enum(CURRENCY_TYPE), default=CURRENCY_TYPE.usd, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    case_title = db.Column(db.String(128), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    severity = db.Column(db.Enum(SeverityLevel), nullable=False, default=SeverityLevel.MEDIUM)
+    status = db.Column(db.Enum(STATUS_TYPE), default=STATUS_TYPE.OPEN, nullable=False)
 
-    date_created  = db.Column(db.DateTime,     default=dt.datetime.utcnow())
-    date_modified = db.Column(db.DateTime,     default=db.func.current_timestamp(),
-                                               onupdate=db.func.current_timestamp())
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
+                              onupdate=db.func.current_timestamp())
+
+    def __repr__(self):
+        return f"{self.case_title} / Severity: {self.severity}"
     
     def __init__(self, **kwargs):
-        super(Product, self).__init__(**kwargs)
+        super(Case, self).__init__(**kwargs)
 
     def __repr__(self):
         return f"{self.name} / ${self.price}"
 
     @classmethod
-    def find_by_id(cls, _id: int) -> "Product":
+    def find_by_id(cls, _id: int) -> "Case":
         return cls.query.filter_by(id=_id).first() 
 
     @classmethod

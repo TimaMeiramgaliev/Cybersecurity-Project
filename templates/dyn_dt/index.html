@@ -1,41 +1,45 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Profile {% endblock %} 
+{% block title %} Case Management Dashboard {% endblock %}
 
-<!-- Specific CSS goes HERE -->
-{% block stylesheets %}{% endblock stylesheets %}
+{% block stylesheets %}
+
+{% endblock stylesheets %}
 
 {% block content %}
-
-
-<div class="container-fluid py-2">
-    <div class="row">
-        <div class="ms-3">
-            <h3 class="mb-0 h4 font-weight-bolder">Dynamic Datatables</h3>
-            <p class="mb-4">
-              Manage your data without coding - Read <u><a target="_blank" href="https://app-generator.dev/docs/products/flask/material-dashboard/index.html">DOCS</a></u>.
-            </p>
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-gradient-dark shadow-sm d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 text-white">Investigation Workspaces</h4>
         </div>
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header p-2 ps-3">
-                    <h4 class="mb-0">Available Routes (defined in config.DYNAMIC_DATATB)</h4>
-                </div>
-                <div class="card-body">
-                    <ul class="">
-                        {% for link in routes %}
-                            <li class="">
-                                <a class="" href="{{ url_for('table_blueprint.model_dt', aPath=link) }}">{{ link }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                    
-                </div>
-            </div>
+
+        <div class="card-body">
+          {% if routes %}
+            <ul class="list-group list-group-flush">
+              {% for link in routes %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <span class="text-capitalize">
+                    <i class="ni ni-collection text-primary me-2"></i>
+                    {{ link.replace('_', ' ') }}
+                  </span>
+                  <a href="{{ url_for('table_blueprint.model_dt', aPath=link) }}" class="btn btn-outline-primary btn-sm">
+                    View
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted">No tables found.</p>
+          {% endif %}
         </div>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock content %}
 
-<!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+<!-- Дополнительные JS-скрипты -->
+{% endblock javascripts %}

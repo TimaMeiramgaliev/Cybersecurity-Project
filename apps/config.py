@@ -75,7 +75,7 @@ class Config(object):
         SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3')
 
     DYNAMIC_DATATB = {
-        "cases": "apps.models.Product"
+        "cases": "apps.models.Case"
     }
 
     CDN_DOMAIN = os.getenv('CDN_DOMAIN')
