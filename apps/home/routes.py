@@ -1,8 +1,4 @@
 # -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
-
 import wtforms
 from apps.home import blueprint
 from flask import render_template, request, redirect, url_for
@@ -14,16 +10,55 @@ from apps.models import *
 from apps.tasks import *
 from apps.authentication.models import Users
 from flask_wtf import FlaskForm
+import json
+import os
+from flask import Blueprint, request, jsonify
+import requests
+from datetime import datetime
+import threading
+import time
+import requests
+import time, base64, tempfile
+from pathlib import Path
+from flask import send_file
+
+from apps.api.agent_state import get_all_agents, get_agent
+
+AGENTS_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "agents.json")
+
+
 
 @blueprint.route('/')
 @blueprint.route('/index')
 def index():
-    context = {
-        'segment': 'dashboard',
-        'parent': 'dashboard',
-        'title':'HOME'
-    }    
-    return render_template('pages/index.html', segment='dashboard', parent='dashboard')
+    agents = get_all_agents()
+    return render_template(
+        'pages/index.html',
+        agents=agents,
+        segment='dashboard',
+        parent='dashboard',
+        title='HOME'
+    )
+
+@blueprint.route('/agent/<agent_id>')
+def view_agent(agent_id):
+    agent = get_agent(agent_id)
+    if not agent:
+        return "Agent not found", 404
+
+    return render_template(
+        'pages/agent_detail.html',
+        agent=agent,
+        agent_id=agent_id,
+        exec_output=None,
+        segment='agent_detail'
+    )
+
+def load_agents():
+    if os.path.exists(AGENTS_FILE):
+        with open(AGENTS_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return []
 
 @blueprint.route('/tables')
 def tables():
@@ -165,3 +200,135 @@ def get_segment(request):
 @blueprint.app_template_filter("replace_value")
 def replace_value(value, arg):
     return value.replace(arg, " ").title()
+
+@blueprint.route('/admin/exec', methods=['POST'])
+def exec_command():
+    agent_id = request.form.get('agent_id')
+    command = request.form.get('command')
+
+    if not agent_id or not command:
+        return "Missing data", 400
+
+    try:
+        r = requests.post(f"http://127.0.0.1:5000/api/agent/{agent_id}/command", json={"command": command})
+        if r.status_code == 200:
+            time.sleep(2)  # дождаться выполнения
+            out = requests.get(f"http://127.0.0.1:5000/api/agent/{agent_id}/get_output").json().get("output") or "No output."
+        else:
+            out = f"Error sending command. Status: {r.status_code}"
+    except Exception as e:
+        out = f"Exception: {e}"
+
+    agent = get_agent(agent_id)
+    return render_template('pages/agent_detail.html', agent=agent, agent_id=agent_id, exec_output=out, segment='agent_detail')
+
+
+
+@blueprint.route('/admin/kill', methods=['POST'])
+def kill_process():
+    agent_id = request.form.get('agent_id')
+    pid = request.form.get('pid')
+
+    if not agent_id or not pid:
+        return "Missing data", 400
+
+    cmd = f"taskkill /PID {pid} /F"
+
+    try:
+        # Отправляем команду агенту
+        response = requests.post(
+            f"http://127.0.0.1:5000/api/agent/{agent_id}/command",
+            json={"command": cmd}
+        )
+
+        if response.status_code == 200:
+            # Ждём, пока агент выполнит команду
+            time.sleep(2)
+
+            # Получаем результат
+            result = requests.get(
+                f"http://127.0.0.1:5000/api/agent/{agent_id}/get_output"
+            )
+            output = result.json().get("output") or "No output."
+        else:
+            output = f"Error sending command. Status: {response.status_code}"
+
+    except Exception as e:
+        output = f"Exception: {e}"
+
+    # Возвращаем ту же страницу с результатом
+    agent = get_agent(agent_id)
+    return render_template(
+        'pages/agent_detail.html',
+        agent=agent,
+        agent_id=agent_id,
+        exec_output=output,
+        segment='agent_detail'
+    )
+
+
+
+@blueprint.route('/admin/processes', methods=['POST'])
+def list_processes():
+    agent_id = request.form.get('agent_id')
+    cmd = "tasklist"
+    try:
+        r = requests.post(f"http://127.0.0.1:5000/api/agent/{agent_id}/command", json={"command": cmd})
+        if r.status_code == 200:
+            time.sleep(2)
+            out = requests.get(f"http://127.0.0.1:5000/api/agent/{agent_id}/get_output").json().get("output") or "No output."
+        else:
+            out = f"Error sending command. Status: {r.status_code}"
+    except Exception as e:
+        out = f"Exception: {e}"
+
+    agent = get_agent(agent_id)
+    return render_template('pages/agent_detail.html', agent=agent, agent_id=agent_id, exec_output=out, segment='agent_detail')
+
+
+
+@blueprint.route('/admin/list_dir', methods=['POST'])
+def list_directory():
+    agent_id = request.form.get('agent_id')
+    dir_path = request.form.get('dir_path')
+
+    if not agent_id or not dir_path:
+        return "Missing data", 400
+
+    cmd = f'dir "{dir_path}"'
+    try:
+        r = requests.post(f"http://127.0.0.1:5000/api/agent/{agent_id}/command", json={"command": cmd})
+        if r.status_code == 200:
+            time.sleep(2)
+            out = requests.get(f"http://127.0.0.1:5000/api/agent/{agent_id}/get_output").json().get("output") or "No output."
+        else:
+            out = f"Error sending command. Status: {r.status_code}"
+    except Exception as e:
+        out = f"Exception: {e}"
+
+    agent = get_agent(agent_id)
+    return render_template('pages/agent_detail.html', agent=agent, agent_id=agent_id, exec_output=out, segment='agent_detail')
+
+
+
+@blueprint.route('/admin/download', methods=['POST'])
+def download_file():
+    agent_id = request.form.get('agent_id')
+    file_path = request.form.get('file_path')
+
+    if not agent_id or not file_path:
+        return "Missing data", 400
+
+    # Просим агента отправить файл
+    cmd = f'__DOWNLOAD__:"{file_path}"'
+    requests.post(
+        f"http://127.0.0.1:5000/api/agent/{agent_id}/command",
+        json={"command": cmd},
+        timeout=5
+    )
+
+    # Дадим агенту время отправить файл
+    time.sleep(3)
+
+    # Редиректим браузер на эндпоинт скачивания «последнего» файла
+    return redirect(f"/api/agent/{agent_id}/files/latest")

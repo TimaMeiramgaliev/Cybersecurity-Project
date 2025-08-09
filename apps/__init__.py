@@ -1,13 +1,14 @@
 # -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
+
+
 
 import os
 from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from importlib import import_module
+
+
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -38,8 +39,16 @@ def create_app(config):
     app = Flask(__name__, static_url_path=static_prefix, template_folder=TEMPLATES_FOLDER, static_folder=STATIC_FOLDER)
 
     app.config.from_object(config)
+
+
+    from apps.api.routes import api as api_blueprint
+    app.register_blueprint(api_blueprint)
+
     register_extensions(app)
     register_blueprints(app)
-    app.register_blueprint(github_blueprint, url_prefix="/login")    
-    app.register_blueprint(google_blueprint, url_prefix="/login")    
+    app.register_blueprint(github_blueprint, url_prefix="/login")
+    app.register_blueprint(google_blueprint, url_prefix="/login")
+
     return app
+
+
