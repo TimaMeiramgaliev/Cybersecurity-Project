@@ -3,35 +3,281 @@
 {% block title %} Case Management Dashboard {% endblock %}
 
 {% block stylesheets %}
-
+<style>
+  .stat-card {
+    transition: all 0.3s ease;
+  }
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12) !important;
+  }
+  .workspace-card {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+  .workspace-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12) !important;
+    border-color: var(--bs-primary);
+  }
+  .workspace-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+  }
+  .stat-number {
+    transition: all 0.3s ease;
+  }
+  .stat-number.updating {
+    opacity: 0.6;
+    transform: scale(0.95);
+  }
+  .stat-number.updated {
+    animation: pulse 0.6s ease;
+  }
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+  .update-indicator {
+    animation: fadeInOut 2s ease-in-out;
+  }
+  @keyframes fadeInOut {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  .last-updated {
+    font-size: 0.75rem;
+    opacity: 0.8;
+  }
+  .stat-card.loading {
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: loading 1.5s infinite;
+  }
+  @keyframes loading {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+</style>
 {% endblock stylesheets %}
 
 {% block content %}
 <div class="container-fluid py-4">
+  <!-- Header Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card bg-gradient-primary shadow-primary border-radius-lg">
+        <div class="card-body p-4">
+          <div class="row align-items-center">
+            <div class="col-auto">
+              <div class="icon icon-shape icon-xl bg-white shadow text-center rounded-circle">
+                <i class="fas fa-folder-open text-primary text-gradient opacity-10"></i>
+              </div>
+            </div>
+            <div class="col">
+              <h3 class="text-white mb-0">Case Management Dashboard</h3>
+              <p class="text-white opacity-8 mb-0">Investigation Workspaces & Data Management</p>
+              <small class="text-white opacity-6" id="last-updated">Last updated: Just now</small>
+            </div>
+            <div class="col-auto">
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-white text-primary fs-6" id="total-workspaces-badge">{{ routes|length }} Workspace{{ 's' if routes|length != 1 else '' }}</span>
+                <div class="update-indicator" id="update-indicator" style="display: none;">
+                  <i class="fas fa-sync-alt fa-spin text-white"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card stat-card">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Workspaces</p>
+                <h5 class="font-weight-bolder mb-0 stat-number" id="total-workspaces">{{ routes|length }}</h5>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="icon icon-shape icon-sm bg-gradient-primary shadow text-center rounded-circle">
+                <i class="fas fa-folder text-white opacity-10"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card stat-card">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-capitalize font-weight-bold">Active Cases</p>
+                <h5 class="font-weight-bolder mb-0 stat-number" id="active-cases">{{ routes|length }}</h5>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="icon icon-shape icon-sm bg-gradient-success shadow text-center rounded-circle">
+                <i class="fas fa-clipboard-check text-white opacity-10"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card stat-card">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-capitalize font-weight-bold">Data Tables</p>
+                <h5 class="font-weight-bolder mb-0 stat-number" id="data-tables">{{ routes|length }}</h5>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="icon icon-shape icon-sm bg-gradient-info shadow text-center rounded-circle">
+                <i class="fas fa-table text-white opacity-10"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card stat-card">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-capitalize font-weight-bold">System Status</p>
+                <h5 class="font-weight-bolder mb-0 text-success">Online</h5>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="icon icon-shape icon-sm bg-gradient-success shadow text-center rounded-circle">
+                <i class="fas fa-server text-white opacity-10"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Workspaces Section -->
   <div class="row">
     <div class="col-12">
-      <div class="card shadow-sm">
-        <div class="card-header bg-gradient-dark shadow-sm d-flex justify-content-between align-items-center">
-            <h4 class="mb-0 text-white">Investigation Workspaces</h4>
+      <div class="card">
+        <div class="card-header p-3 pb-0">
+          <h6 class="mb-0">
+            <i class="fas fa-briefcase text-primary me-2"></i>
+            Investigation Workspaces
+          </h6>
+          <p class="text-sm text-secondary mb-0">Select a workspace to view and manage its data</p>
         </div>
 
-        <div class="card-body">
+        <div class="card-body p-3">
           {% if routes %}
-            <ul class="list-group list-group-flush">
+            <div class="row">
               {% for link in routes %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                  <span class="text-capitalize">
-                    <i class="ni ni-collection text-primary me-2"></i>
-                    {{ link.replace('_', ' ') }}
-                  </span>
-                  <a href="{{ url_for('table_blueprint.model_dt', aPath=link) }}" class="btn btn-outline-primary btn-sm">
-                    View
-                  </a>
-                </li>
+                <div class="col-lg-6 col-md-6 mb-4">
+                  <div class="card workspace-card h-100">
+                    <div class="card-body p-4">
+                      <div class="row align-items-center">
+                        <div class="col-auto">
+                          <div class="workspace-icon bg-gradient-primary text-white">
+                            {% if 'case' in link.lower() %}
+                              <i class="fas fa-folder-open"></i>
+                            {% elif 'agent' in link.lower() %}
+                              <i class="fas fa-desktop"></i>
+                            {% elif 'user' in link.lower() %}
+                              <i class="fas fa-user"></i>
+                            {% elif 'log' in link.lower() %}
+                              <i class="fas fa-file-alt"></i>
+                            {% else %}
+                              <i class="fas fa-database"></i>
+                            {% endif %}
+                          </div>
+                        </div>
+                        <div class="col">
+                          <h6 class="mb-1 text-capitalize font-weight-bold">
+                            {{ link.replace('_', ' ') }}
+                          </h6>
+                          <p class="text-sm text-secondary mb-2">
+                            {% if 'case' in link.lower() %}
+                              Investigation case management and tracking
+                            {% elif 'agent' in link.lower() %}
+                              Remote agent monitoring and control
+                            {% elif 'user' in link.lower() %}
+                              User account management and permissions
+                            {% elif 'log' in link.lower() %}
+                              System logs and audit trails
+                            {% else %}
+                              Data table management and analysis
+                            {% endif %}
+                          </p>
+                          <div class="d-flex align-items-center">
+                            <span class="badge bg-light text-dark me-2">
+                              <i class="fas fa-table me-1"></i>Data Table
+                            </span>
+                            <span class="badge bg-success text-white">
+                              <i class="fas fa-check me-1"></i>Active
+                            </span>
+                          </div>
+                        </div>
+                        <div class="col-auto">
+                          <a href="{{ url_for('table_blueprint.model_dt', aPath=link) }}"
+                             class="btn btn-primary btn-sm">
+                            <i class="fas fa-external-link-alt me-1"></i>
+                            Open
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               {% endfor %}
-            </ul>
+            </div>
           {% else %}
-            <p class="text-muted">No tables found.</p>
+            <div class="text-center py-5">
+              <div class="icon icon-shape icon-xl bg-light text-center rounded-circle mx-auto mb-3">
+                <i class="fas fa-folder-open text-secondary opacity-10"></i>
+              </div>
+              <h5 class="text-secondary">No Workspaces Found</h5>
+              <p class="text-muted">There are currently no investigation workspaces available.</p>
+              <button class="btn btn-primary btn-sm">
+                <i class="fas fa-plus me-1"></i>
+                Create Workspace
+              </button>
+            </div>
           {% endif %}
         </div>
       </div>
@@ -41,5 +287,249 @@
 {% endblock content %}
 
 {% block javascripts %}
-<!-- Дополнительные JS-скрипты -->
+<script>
+  // Add smooth animations and interactions
+  document.addEventListener('DOMContentLoaded', function() {
+    // Animate cards on scroll
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    // Observe all workspace cards
+    document.querySelectorAll('.workspace-card').forEach(card => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+      card.style.transition = 'all 0.6s ease';
+      observer.observe(card);
+    });
+
+    // Add click effects to buttons
+    document.querySelectorAll('.btn').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        // Create ripple effect
+        const ripple = document.createElement('span');
+        const rect = this.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        ripple.classList.add('ripple');
+
+        this.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 600);
+      });
+    });
+
+    // Load initial statistics
+    loadStatistics();
+
+    // Set up auto-refresh every 30 seconds
+    setInterval(loadStatistics, 30000);
+
+    // Also try to load fallback statistics immediately as a backup
+    setTimeout(() => {
+      const activeCasesElement = document.getElementById('active-cases');
+      if (activeCasesElement && activeCasesElement.textContent === '-') {
+        console.log('Active cases still showing "-", loading fallback...');
+        loadFallbackStatistics();
+      }
+    }, 2000);
+  });
+
+  // Function to load statistics from the server
+  function loadStatistics() {
+    console.log('Loading statistics...');
+
+    // Show loading state
+    const activeCasesElement = document.getElementById('active-cases');
+    const updateIndicator = document.getElementById('update-indicator');
+
+    if (activeCasesElement) {
+      activeCasesElement.classList.add('updating');
+      activeCasesElement.textContent = '...';
+      console.log('Active cases element found, showing loading state');
+    } else {
+      console.error('Active cases element not found!');
+    }
+
+    if (updateIndicator) {
+      updateIndicator.style.display = 'block';
+    }
+
+    // Fetch statistics from the server
+    console.log('Fetching from /dynamic-dt/stats...');
+    fetch('/dynamic-dt/stats')
+      .then(response => {
+        console.log('Response received:', response.status, response.statusText);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Statistics data received:', data);
+
+        // Update Active Cases count
+        if (activeCasesElement) {
+          const activeCases = data.active_cases !== undefined ? data.active_cases : 0;
+          activeCasesElement.textContent = activeCases;
+          activeCasesElement.classList.remove('updating');
+          activeCasesElement.classList.add('updated');
+          console.log('Active cases updated to:', activeCases);
+
+          // Show source information if available
+          if (data.active_cases_source) {
+            console.log('Active cases source:', data.active_cases_source);
+          }
+
+          // Remove the updated animation class after animation completes
+          setTimeout(() => {
+            activeCasesElement.classList.remove('updated');
+          }, 600);
+        }
+
+        // Update Total Workspaces if it changed
+        const totalWorkspacesElement = document.getElementById('total-workspaces');
+        const totalWorkspacesBadge = document.getElementById('total-workspaces-badge');
+        if (totalWorkspacesElement && data.total_workspaces !== undefined) {
+          totalWorkspacesElement.textContent = data.total_workspaces;
+        }
+        if (totalWorkspacesBadge && data.total_workspaces !== undefined) {
+          totalWorkspacesBadge.textContent = data.total_workspaces + ' Workspace' + (data.total_workspaces !== 1 ? 's' : '');
+        }
+
+        // Update Data Tables count if it changed
+        const dataTablesElement = document.getElementById('data-tables');
+        if (dataTablesElement && data.data_tables !== undefined) {
+          dataTablesElement.textContent = data.data_tables;
+        }
+
+        // Update last updated time
+        const lastUpdatedElement = document.getElementById('last-updated');
+        if (lastUpdatedElement) {
+          const now = new Date();
+          lastUpdatedElement.textContent = `Last updated: ${now.toLocaleTimeString()}`;
+          lastUpdatedElement.style.color = ''; // Reset color
+        }
+
+        // Hide update indicator after a short delay
+        if (updateIndicator) {
+          setTimeout(() => {
+            updateIndicator.style.display = 'none';
+          }, 1000);
+        }
+
+        console.log('Statistics updated successfully');
+
+        // Log additional debug info
+        if (data.case_fields) {
+          console.log('Case fields available:', data.case_fields);
+        }
+      })
+      .catch(error => {
+        console.error('Error loading statistics:', error);
+
+        // Reset to default values on error
+        if (activeCasesElement) {
+          activeCasesElement.textContent = '0';
+          activeCasesElement.classList.remove('updating');
+          console.log('Reset active cases to 0 due to error');
+        }
+
+        // Hide update indicator on error
+        if (updateIndicator) {
+          updateIndicator.style.display = 'none';
+        }
+
+        // Show error in last updated
+        const lastUpdatedElement = document.getElementById('last-updated');
+        if (lastUpdatedElement) {
+          lastUpdatedElement.textContent = 'Last updated: Error occurred';
+          lastUpdatedElement.style.color = '#ff6b6b';
+        }
+
+        // Try to load fallback statistics
+        loadFallbackStatistics();
+      });
+  }
+
+  // Function to load fallback statistics from the page data
+  function loadFallbackStatistics() {
+    console.log('Loading fallback statistics...');
+
+    const activeCasesElement = document.getElementById('active-cases');
+    if (activeCasesElement) {
+      // Use the routes length as a fallback for active cases
+      const fallbackCount = {{ routes|length }};
+      activeCasesElement.textContent = fallbackCount;
+      console.log('Fallback active cases count:', fallbackCount);
+    }
+  }
+
+  // Function to manually refresh statistics
+  function refreshStats() {
+    const refreshBtn = event.target;
+    const originalText = refreshBtn.innerHTML;
+
+    // Show loading state
+    refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Refreshing...';
+    refreshBtn.disabled = true;
+
+    // Load statistics
+    loadStatistics();
+
+    // Reset button after a short delay
+    setTimeout(() => {
+      refreshBtn.innerHTML = originalText;
+      refreshBtn.disabled = false;
+    }, 2000);
+  }
+
+  // Listen for messages from other pages (if they're in the same window context)
+  window.addEventListener('message', function(event) {
+    if (event.data.type === 'CASE_UPDATED') {
+      // Refresh statistics when a case is added/updated/deleted
+      loadStatistics();
+    }
+  });
+
+  // Listen for storage events (if other tabs update localStorage)
+  window.addEventListener('storage', function(event) {
+    if (event.key === 'case_management_updated') {
+      // Refresh statistics when localStorage is updated from another tab
+      loadStatistics();
+    }
+  });
+</script>
+
+<style>
+  .ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(0);
+    animation: ripple-animation 0.6s linear;
+    pointer-events: none;
+  }
+
+  @keyframes ripple-animation {
+    to {
+      transform: scale(4);
+      opacity: 0;
+    }
+  }
+</style>
 {% endblock javascripts %}

@@ -23,6 +23,7 @@ from pathlib import Path
 from flask import send_file
 
 from apps.api.agent_state import get_all_agents, get_agent
+from apps.api.threat_intel import get_recent_conns
 
 AGENTS_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "agents.json")
 
@@ -64,12 +65,16 @@ def view_agent(agent_id):
     if not agent:
         return "Agent not found", 404
 
+    # ДОБАВЬ: подтянуть последние соединения
+    conns = get_recent_conns(agent_id, limit=50)
+
     return render_template(
         'pages/agent_detail.html',
         agent=agent,
         agent_id=agent_id,
         exec_output=None,
-        segment='agent_detail'
+        segment='agent_detail',
+        conns=conns,                # <<< ПЕРЕДАЁМ В ШАБЛОН
     )
 
 def load_agents():

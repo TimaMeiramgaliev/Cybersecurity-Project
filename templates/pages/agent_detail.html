@@ -3,86 +3,332 @@
 {% block title %} Agent {{ agent['id'] }} {% endblock %}
 
 {% block content %}
-<div class="container py-4">
-  <h3>Agent {{ agent['id'] }}</h3>
-  <ul>
-    <li><strong>Hostname:</strong> {{ agent['hostname'] }}</li>
-    <li><strong>IP:</strong> {{ agent['ip'] }}</li>
-    <li><strong>OS:</strong> {{ agent['os'] }}</li>
-    <li><strong>MAC:</strong> {{ agent['mac'] }}</li>
-    <li><strong>Last Seen:</strong> {{ agent['last_seen'] }}</li>
-  </ul>
-
-  <h5 class="mt-4">Actions</h5>
-
-  <form method="POST" action="/admin/download">
-    <input type="hidden" name="agent_id" value="{{ agent['id'] }}">
-    <input type="hidden" name="agent_url" value="{{ agent['url'] }}">
-    <div class="input-group mb-3">
-      <input type="text" class="form-control" name="file_path" placeholder="C:/Users/Agent/Documents/file.txt" required>
-      <button class="btn btn-primary" type="submit">📥 Download File</button>
+<div class="container-fluid py-4">
+  <!-- Header Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card bg-gradient-primary shadow-primary border-radius-lg">
+        <div class="card-body p-4">
+          <div class="row align-items-center">
+            <div class="col-auto">
+              <div class="icon icon-shape icon-xl bg-white shadow text-center rounded-circle">
+                <i class="fas fa-desktop text-primary text-gradient opacity-10"></i>
+              </div>
+            </div>
+            <div class="col">
+              <h3 class="text-white mb-0">Agent {{ agent['id'] }}</h3>
+              <p class="text-white opacity-8 mb-0">Remote System Management</p>
+            </div>
+            <div class="col-auto">
+              <span class="badge bg-white text-primary">Active</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </form>
+  </div>
 
-  <form method="POST" action="/admin/kill">
-    <input type="hidden" name="agent_id" value="{{ agent['id'] }}">
-    <input type="hidden" name="agent_url" value="{{ agent['url'] }}">
-    <div class="input-group mb-3">
-      <input type="text" class="form-control" name="pid" placeholder="Enter PID to kill" required>
-      <button class="btn btn-danger" type="submit">❌ Kill Process</button>
+  <!-- Agent Information Cards -->
+  <div class="row mb-4">
+    <div class="col-lg-6 col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header p-3 pb-0">
+          <h6 class="mb-0">
+            <i class="fas fa-info-circle text-info me-2"></i>
+            System Information
+          </h6>
+        </div>
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-6">
+              <div class="d-flex flex-column mb-3">
+                <h6 class="text-uppercase text-body text-xs font-weight-bolder opacity-7">Hostname</h6>
+                <span class="text-sm font-weight-bold">{{ agent['hostname'] }}</span>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="d-flex flex-column mb-3">
+                <h6 class="text-uppercase text-body text-xs font-weight-bolder opacity-7">IP Address</h6>
+                <span class="text-sm font-weight-bold">{{ agent['ip'] }}</span>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="d-flex flex-column mb-3">
+                <h6 class="text-uppercase text-body text-xs font-weight-bolder opacity-7">Operating System</h6>
+                <span class="text-sm font-weight-bold">{{ agent['os'] }}</span>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="d-flex flex-column mb-3">
+                <h6 class="text-uppercase text-body text-xs font-weight-bolder opacity-7">MAC Address</h6>
+                <span class="text-sm font-weight-bold">{{ agent['mac'] }}</span>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="d-flex flex-column">
+                <h6 class="text-uppercase text-body text-xs font-weight-bolder opacity-7">Last Seen</h6>
+                <span class="text-sm font-weight-bold">{{ agent['last_seen'] }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </form>
 
-  <form method="POST" action="/admin/processes">
-    <input type="hidden" name="agent_id" value="{{ agent['id'] }}">
-    <input type="hidden" name="agent_url" value="{{ agent['url'] }}">
-    <button class="btn btn-info mb-3">🧠 Show Processes</button>
-  </form>
-
-  <form method="POST" action="/admin/list_dir">
-    <input type="hidden" name="agent_id" value="{{ agent['id'] }}">
-    <input type="hidden" name="agent_url" value="{{ agent['url'] }}">
-    <div class="input-group mb-3">
-      <input type="text" class="form-control" name="dir_path" placeholder="C:/Users/Agent/Desktop" required>
-      <button class="btn btn-secondary" type="submit">📁 Show Directory</button>
+    <div class="col-lg-6 col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header p-3 pb-0">
+          <h6 class="mb-0">
+            <i class="fas fa-chart-line text-success me-2"></i>
+            Quick Actions
+          </h6>
+        </div>
+        <div class="card-body p-3">
+          <div class="row g-2">
+            <div class="col-6">
+              <button class="btn btn-outline-info btn-sm w-100" onclick="document.getElementById('screenshot-form').submit()">
+                <i class="fas fa-camera me-1"></i> Screenshot
+              </button>
+            </div>
+            <div class="col-6">
+              <button class="btn btn-outline-success btn-sm w-100" onclick="document.getElementById('processes-form').submit()">
+                <i class="fas fa-tasks me-1"></i> Processes
+              </button>
+            </div>
+            <div class="col-6">
+              <button class="btn btn-outline-warning btn-sm w-100" data-bs-toggle="modal" data-bs-target="#yaraModal">
+                <i class="fas fa-search me-1"></i> YARA Scan
+              </button>
+            </div>
+            <div class="col-6">
+              <button class="btn btn-outline-secondary btn-sm w-100" data-bs-toggle="modal" data-bs-target="#directoryModal">
+                <i class="fas fa-folder me-1"></i> Browse Files
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </form>
+  </div>
 
-  <form method="POST" action="/admin/exec">
-    <input type="hidden" name="agent_id" value="{{ agent['id'] }}">
-    <input type="hidden" name="agent_url" value="{{ agent['url'] }}">
-    <div class="input-group mb-3">
-      <input type="text" class="form-control" name="command" placeholder="Enter command (e.g., whoami)" required>
-      <button class="btn btn-warning" type="submit">▶ Run Command</button>
+  <!-- Action Forms Section -->
+  <div class="row">
+    <!-- File Download -->
+    <div class="col-lg-6 col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header p-3 pb-0">
+          <h6 class="mb-0">
+            <i class="fas fa-download text-primary me-2"></i>
+            Download File
+          </h6>
+        </div>
+        <div class="card-body p-3">
+          <form method="POST" action="/admin/download">
+            <input type="hidden" name="agent_id" value="{{ agent['id'] }}">
+            <input type="hidden" name="agent_url" value="{{ agent['url'] }}">
+            <div class="input-group input-group-outline">
+              <input type="text" class="form-control" name="file_path" placeholder="C:/Users/Agent/Documents/file.txt" required>
+            </div>
+            <button class="btn btn-primary btn-sm w-100 mt-3" type="submit">
+              <i class="fas fa-download me-1"></i> Download File
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
-  </form>
 
-    <form method="POST" action="/admin/screenshot">
-      <input type="hidden" name="agent_id" value="{{ agent['id'] }}">
-      <button class="btn btn-outline-primary" type="submit">📸 Screenshot</button>
-    </form>
+    <!-- Process Management -->
+    <div class="col-lg-6 col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header p-3 pb-0">
+          <h6 class="mb-0">
+            <i class="fas fa-skull text-danger me-2"></i>
+            Process Management
+          </h6>
+        </div>
+        <div class="card-body p-3">
+          <form method="POST" action="/admin/kill">
+            <input type="hidden" name="agent_id" value="{{ agent['id'] }}">
+            <input type="hidden" name="agent_url" value="{{ agent['url'] }}">
+            <div class="input-group input-group-outline">
+              <input type="text" class="form-control" name="pid" placeholder="Enter PID to kill" required>
+            </div>
+            <button class="btn btn-danger btn-sm w-100 mt-3" type="submit">
+              <i class="fas fa-times me-1"></i> Kill Process
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
 
-    <form method="POST" action="/admin/yara" enctype="multipart/form-data" class="mt-3">
-      <input type="hidden" name="agent_id" value="{{ agent['id'] }}">
-      <div class="input-group">
-        <input class="form-control" type="file" name="rules" accept=".yar,.yara" required>
-        <button class="btn btn-warning" type="submit">🧪 Run YARA</button>
-     </div>
-    <small class="text-muted">Runs in agent's current working directory (use shell: cd …).</small>
-    </form>
+    <!-- Command Execution -->
+    <div class="col-lg-6 col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header p-3 pb-0">
+          <h6 class="mb-0">
+            <i class="fas fa-terminal text-warning me-2"></i>
+            Execute Command
+          </h6>
+        </div>
+        <div class="card-body p-3">
+          <form method="POST" action="/admin/exec">
+            <input type="hidden" name="agent_id" value="{{ agent['id'] }}">
+            <input type="hidden" name="agent_url" value="{{ agent['url'] }}">
+            <div class="input-group input-group-outline">
+              <input type="text" class="form-control" name="command" placeholder="Enter command (e.g., whoami)" required>
+            </div>
+            <button class="btn btn-warning btn-sm w-100 mt-3" type="submit">
+              <i class="fas fa-play me-1"></i> Run Command
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
 
+    <!-- Hidden Forms for Quick Actions -->
+    <div class="d-none">
+      <form id="screenshot-form" method="POST" action="/admin/screenshot">
+        <input type="hidden" name="agent_id" value="{{ agent['id'] }}">
+      </form>
+
+      <form id="processes-form" method="POST" action="/admin/processes">
+        <input type="hidden" name="agent_id" value="{{ agent['id'] }}">
+        <input type="hidden" name="agent_url" value="{{ agent['url'] }}">
+      </form>
+    </div>
+  </div>
+
+  <!-- Command Output Display -->
   {% if exec_output %}
-  <div class="card mt-4">
-    <div class="card-header bg-gradient-info text-white">
-      📤 Command Output
-    </div>
-    <div class="card-body" style="max-height: 400px; overflow-y: auto;">
-      <pre style="white-space: pre-wrap; font-family: monospace; background-color: #f8f9fa; padding: 1rem; border-radius: 5px;">
-{{ exec_output }}
-      </pre>
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header p-3 pb-0">
+          <h6 class="mb-0">
+            <i class="fas fa-terminal text-info me-2"></i>
+            Command Output
+          </h6>
+        </div>
+        <div class="card-body p-3">
+          <div class="bg-dark text-light p-3 rounded" style="max-height: 400px; overflow-y: auto;">
+            <pre class="mb-0" style="white-space: pre-wrap; font-family: 'Courier New', monospace; font-size: 0.875rem;">{{ exec_output }}</pre>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   {% endif %}
+</div>
 
+<!-- YARA Modal -->
+<div class="modal fade" id="yaraModal" tabindex="-1" aria-labelledby="yaraModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="yaraModalLabel">
+          <i class="fas fa-search text-warning me-2"></i>
+          YARA Scan
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="/admin/yara" enctype="multipart/form-data">
+        <div class="modal-body">
+          <input type="hidden" name="agent_id" value="{{ agent['id'] }}">
+          <div class="mb-3">
+            <label for="rules" class="form-label">YARA Rules File</label>
+            <input class="form-control" type="file" name="rules" accept=".yar,.yara" required>
+          </div>
+          <small class="text-muted">
+            <i class="fas fa-info-circle me-1"></i>
+            Runs in agent's current working directory (use shell: cd …).
+          </small>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-warning">
+            <i class="fas fa-search me-1"></i> Run YARA
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Directory Browser Modal -->
+<div class="modal fade" id="directoryModal" tabindex="-1" aria-labelledby="directoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="directoryModalLabel">
+          <i class="fas fa-folder text-secondary me-2"></i>
+          Browse Directory
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="/admin/list_dir">
+        <div class="modal-body">
+          <input type="hidden" name="agent_id" value="{{ agent['id'] }}">
+          <input type="hidden" name="agent_url" value="{{ agent['url'] }}">
+          <div class="mb-3">
+            <label for="dir_path" class="form-label">Directory Path</label>
+            <input type="text" class="form-control" name="dir_path" placeholder="C:/Users/Agent/Desktop" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-secondary">
+            <i class="fas fa-folder me-1"></i> Show Directory
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+    <div class="card mt-4">
+  <div class="card-header">
+    <h5 class="card-title m-0">Network Connections (with AbuseIPDB)</h5>
+  </div>
+  <div class="card-body p-0">
+    {% if conns and conns|length > 0 %}
+    <div class="table-responsive">
+      <table class="table table-sm table-striped mb-0">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>IP</th>
+            <th>Port</th>
+            <th>PID</th>
+            <th>Process</th>
+            <th>Abuse Score</th>
+            <th>Reports</th>
+            <th>Country</th>
+            <th>Categories</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in conns %}
+          <tr class="{% if c.abuse_score >= 50 %}table-danger{% elif c.abuse_score >= 10 %}table-warning{% endif %}">
+            <td>{{ c.ts or c.received_ts }}</td>
+            <td>{{ c.ip }}</td>
+            <td>{{ c.port }}</td>
+            <td>{{ c.pid }}</td>
+            <td>{{ c.proc }}</td>
+            <td>{{ c.abuse_score }}</td>
+            <td>{{ c.abuse_reports }}</td>
+            <td>{{ c.country or '-' }}</td>
+            <td>
+              {% if c.categories %}{{ c.categories|join(', ') }}{% else %}-{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <em class="text-muted d-block p-3">No data about connections</em>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}

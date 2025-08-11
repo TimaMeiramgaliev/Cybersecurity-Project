@@ -3,12 +3,14 @@ import json, csv, io
 from flask_login import login_required
 from apps.dyn_dt import blueprint
 from flask import render_template, request, redirect, url_for, jsonify, make_response
-from apps.dyn_dt.utils import get_model_field_names, get_model_fk_values, name_to_class, user_filter, exclude_auto_gen_fields
+from apps.dyn_dt.utils import get_model_field_names, get_model_fk_values, name_to_class, user_filter, \
+    exclude_auto_gen_fields
 from apps import db, config
 from apps.dyn_dt.utils import *
 from sqlalchemy import and_
 from sqlalchemy import Integer, DateTime, String, Text
 from datetime import datetime
+
 
 @blueprint.route('/dynamic-dt')
 def dynamic_dt():
@@ -18,13 +20,147 @@ def dynamic_dt():
     }
     return render_template('dyn_dt/index.html', **context)
 
+
+@blueprint.route('/dynamic-dt/test')
+def test_endpoint():
+    """Simple test endpoint to verify routing is working"""
+    return jsonify({
+        'status': 'success',
+        'message': 'Dynamic DT routes are working',
+        'timestamp': datetime.now().isoformat()
+    })
+
+
+@blueprint.route('/dynamic-dt/debug')
+def debug_database():
+    """Debug endpoint to show database contents"""
+    try:
+        debug_info = {
+            'DYNAMIC_DATATB': config.Config.DYNAMIC_DATATB,
+            'tables': {}
+        }
+
+        for table_name, model_name in config.Config.DYNAMIC_DATATB.items():
+            try:
+                ModelClass = name_to_class(model_name)
+                if ModelClass:
+                    record_count = ModelClass.query.count()
+                    debug_info['tables'][table_name] = {
+                        'model_name': model_name,
+                        'record_count': record_count,
+                        'fields': [field.name for field in ModelClass.__table__.columns] if hasattr(ModelClass,
+                                                                                                    '__table__') else []
+                    }
+
+                    # Show first few records for debugging
+                    if record_count > 0:
+                        first_record = ModelClass.query.first()
+                        if first_record:
+                            debug_info['tables'][table_name]['sample_record'] = {
+                                'id': getattr(first_record, 'id', 'N/A'),
+                                'repr': str(first_record)
+                            }
+                else:
+                    debug_info['tables'][table_name] = {
+                        'model_name': model_name,
+                        'error': 'Model class not found'
+                    }
+            except Exception as e:
+                debug_info['tables'][table_name] = {
+                    'model_name': model_name,
+                    'error': str(e)
+                }
+
+        return jsonify(debug_info)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@blueprint.route('/dynamic-dt/stats')
+def get_statistics():
+    """Get real-time statistics for the dashboard"""
+    try:
+        stats = {}
+
+        # Get total workspaces
+        stats['total_workspaces'] = len(config.Config.DYNAMIC_DATATB.keys())
+        print(f"Total workspaces: {stats['total_workspaces']}")
+
+        # Get active cases count (if cases table exists)
+        if 'cases' in config.Config.DYNAMIC_DATATB:
+            try:
+                CaseModel = name_to_class(config.Config.DYNAMIC_DATATB['cases'])
+                print(f"Case model found: {CaseModel}")
+
+                if CaseModel:
+                    # Count all cases - this should match the "Total Records" from model.html
+                    total_cases = CaseModel.query.count()
+                    stats['active_cases'] = total_cases
+                    print(f"Total cases counted: {total_cases}")
+
+                    # Also get the actual field names for debugging
+                    if hasattr(CaseModel, '__table__'):
+                        field_names = [field.name for field in CaseModel.__table__.columns]
+                        stats['case_fields'] = field_names
+                        print(f"Case fields: {field_names}")
+
+                else:
+                    stats['active_cases'] = 0
+                    print("Case model is None, setting active_cases to 0")
+            except Exception as e:
+                print(f"Error getting cases count: {e}")
+                stats['active_cases'] = 0
+        else:
+            # If no 'cases' table, try to find any table that might contain case data
+            print("No 'cases' in DYNAMIC_DATATB, looking for alternative...")
+            stats['active_cases'] = 0
+
+            # Try to get count from the first available table as fallback
+            for table_name, model_name in config.Config.DYNAMIC_DATATB.items():
+                try:
+                    ModelClass = name_to_class(model_name)
+                    if ModelClass:
+                        record_count = ModelClass.query.count()
+                        print(f"Table '{table_name}' has {record_count} records")
+                        # Use the first table's count as active cases
+                        stats['active_cases'] = record_count
+                        stats['active_cases_source'] = table_name
+                        break
+                except Exception as e:
+                    print(f"Error counting records in {table_name}: {e}")
+                    continue
+
+        # Get data tables count
+        stats['data_tables'] = len(config.Config.DYNAMIC_DATATB.keys())
+
+        # Get system status
+        stats['system_status'] = 'Online'
+
+        # Add timestamp for debugging
+        stats['last_updated'] = datetime.now().isoformat()
+
+        print(f"Final stats: {stats}")
+        return jsonify(stats)
+
+    except Exception as e:
+        print(f"Error getting statistics: {e}")
+        return jsonify({
+            'error': 'Failed to get statistics',
+            'active_cases': 0,
+            'total_workspaces': len(config.Config.DYNAMIC_DATATB.keys()),
+            'data_tables': len(config.Config.DYNAMIC_DATATB.keys()),
+            'system_status': 'Error'
+        }), 500
+
+
 @blueprint.route('/create_filter/<model_name>', methods=["POST"])
 def create_filter(model_name):
     model_name = model_name.lower()
     if request.method == "POST":
         keys = request.form.getlist('key')
         values = request.form.getlist('value')
-        
+
         for key, value in zip(keys, values):
             filter_instance = ModelFilter.query.filter_by(parent=model_name, key=key).first()
             if filter_instance:
@@ -32,7 +168,7 @@ def create_filter(model_name):
             else:
                 filter_instance = ModelFilter(parent=model_name, key=key, value=value)
             db.session.add(filter_instance)
-        
+
         db.session.commit()
         return redirect(url_for('table_blueprint.model_dt', aPath=model_name))
 
@@ -64,7 +200,7 @@ def create_hide_show_filter(model_name):
             filter_instance.value = data.get('value')
         else:
             filter_instance = HideShowFilter(parent=model_name, key=data.get('key'), value=data.get('value'))
-        
+
         db.session.add(filter_instance)
         db.session.commit()
 
@@ -100,7 +236,7 @@ def model_dt(aPath):
     db_filters = []
     for f in db_fields:
         if f not in fk_fields.keys():
-            db_filters.append( f )
+            db_filters.append(f)
 
     choices_dict = {}
     for column in aModelClass.__table__.columns:
@@ -143,7 +279,7 @@ def model_dt(aPath):
     items = pagination.items
 
     # Read-only and field types
-    read_only_fields = ('id', 'user_id', 'date_created', 'date_modified', )
+    read_only_fields = ('id', 'user_id', 'date_created', 'date_modified',)
     integer_fields = get_model_field_names(aModelClass, Integer)
     date_time_fields = get_model_field_names(aModelClass, DateTime)
     text_fields = get_model_field_names(aModelClass, Text)
@@ -177,6 +313,7 @@ def model_dt(aPath):
 @blueprint.route('/create/<aPath>', methods=["POST"])
 @login_required
 def create(aPath):
+    aModelName = None
     aModelClass = None
 
     if aPath in config.Config.DYNAMIC_DATATB:
@@ -184,33 +321,35 @@ def create(aPath):
         aModelClass = name_to_class(aModelName)
 
     if not aModelClass:
-        return ' > ERR: Getting ModelClass for path: ' + aPath
+        return f'ERR: Getting ModelClass for path: {aPath}', 404
 
-    if request.method == 'POST':
-        data = {}
-        fk_fields = get_model_fk_values(aModelClass)
+    try:
+        # Get form data
+        form_data = {}
+        for field_name in request.form:
+            if field_name != 'csrf_token':  # Exclude CSRF token
+                form_data[field_name] = request.form[field_name]
 
-        for attribute, value in request.form.items():
-            if attribute in fk_fields.keys():
-                table_name = None
-                for product in fk_fields[attribute]:
-                    table_name = product.__class__.__tablename__
-                if table_name:
-                    model_name = config.Config.DYNAMIC_DATATB[table_name]
-                    value = name_to_class(model_name).query.filter_by(id=value).first()
-
-            data[attribute] = value if value else ''
-
-        new_item = aModelClass(**data)
-        db.session.add(new_item)
+        # Create new instance
+        new_instance = aModelClass(**form_data)
+        db.session.add(new_instance)
         db.session.commit()
 
-    return redirect(request.referrer) 
+        # Redirect with success message
+        return redirect(
+            url_for('table_blueprint.model_dt', aPath=aPath) + '?success=created&message=Item created successfully')
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error creating item: {e}")
+        return redirect(
+            url_for('table_blueprint.model_dt', aPath=aPath) + '?error=creation_failed&message=Failed to create item')
 
 
 @blueprint.route('/delete/<aPath>/<id>', methods=["GET"])
 @login_required
 def delete(aPath, id):
+    aModelName = None
     aModelClass = None
 
     if aPath in config.Config.DYNAMIC_DATATB:
@@ -218,19 +357,34 @@ def delete(aPath, id):
         aModelClass = name_to_class(aModelName)
 
     if not aModelClass:
-        return ' > ERR: Getting ModelClass for path: ' + aPath
-    
-    item = aModelClass.query.get(id)
-    if item:
-        db.session.delete(item)
+        return f'ERR: Getting ModelClass for path: {aPath}', 404
+
+    try:
+        # Get the instance to delete
+        instance = aModelClass.query.get(id)
+        if not instance:
+            return redirect(
+                url_for('table_blueprint.model_dt', aPath=aPath) + '?error=not_found&message=Item not found')
+
+        # Delete the instance
+        db.session.delete(instance)
         db.session.commit()
 
-    return redirect(request.referrer)
+        # Redirect with success message
+        return redirect(
+            url_for('table_blueprint.model_dt', aPath=aPath) + '?success=deleted&message=Item deleted successfully')
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error deleting item: {e}")
+        return redirect(
+            url_for('table_blueprint.model_dt', aPath=aPath) + '?error=delete_failed&message=Failed to delete item')
 
 
 @blueprint.route('/update/<aPath>/<int:id>', methods=["POST"])
 @login_required
 def update(aPath, id):
+    aModelName = None
     aModelClass = None
 
     if aPath in config.Config.DYNAMIC_DATATB:
@@ -238,30 +392,31 @@ def update(aPath, id):
         aModelClass = name_to_class(aModelName)
 
     if not aModelClass:
-        return ' > ERR: Getting ModelClass for path: ' + aPath
+        return f'ERR: Getting ModelClass for path: {aPath}', 404
 
-    item = aModelClass.query.get(id)
-    if not item:
-        return 'Item not found', 404
+    try:
+        # Get the instance to update
+        instance = aModelClass.query.get(id)
+        if not instance:
+            return redirect(
+                url_for('table_blueprint.model_dt', aPath=aPath) + '?error=not_found&message=Item not found')
 
-    fk_fields = get_model_fk_values(aModelClass)
+        # Update fields
+        for field_name in request.form:
+            if field_name != 'csrf_token' and hasattr(instance, field_name):
+                setattr(instance, field_name, request.form[field_name])
 
-    if request.method == 'POST':
-        for attribute, value in request.form.items():
-            if hasattr(item, attribute) and getattr(item, attribute, value) is not None:
-                if attribute in fk_fields.keys():
-                    table_name = None
-                    for product in fk_fields[attribute]:
-                        table_name = product.__class__.__tablename__
-                    if table_name:
-                        model_name = config.Config.DYNAMIC_DATATB[table_name]
-                        value = name_to_class(model_name).query.filter_by(id=value).first()
-
-                setattr(item, attribute, value)
-        
         db.session.commit()
 
-    return redirect(request.referrer)
+        # Redirect with success message
+        return redirect(
+            url_for('table_blueprint.model_dt', aPath=aPath) + '?success=updated&message=Item updated successfully')
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error updating item: {e}")
+        return redirect(
+            url_for('table_blueprint.model_dt', aPath=aPath) + '?error=update_failed&message=Failed to update item')
 
 
 @blueprint.route('/export/<aPath>', methods=['GET'])
@@ -286,7 +441,6 @@ def export_csv(aPath):
             fields.append(field.key)
         else:
             print(f"Field {field.key} does not exist in {aModelClass} model.")
-
 
     output = io.StringIO()
     writer = csv.writer(output)
@@ -327,14 +481,14 @@ def export_csv(aPath):
 def getattribute(value, arg):
     try:
         attr_value = getattr(value, arg)
-        
+
         if isinstance(attr_value, datetime):
             return attr_value.strftime("%Y-%m-%d %H:%M:%S")
-        
+
         return attr_value
     except AttributeError:
         return ''
-    
+
 
 @blueprint.app_template_filter('getenumattribute')
 def getenumattribute(value, arg):

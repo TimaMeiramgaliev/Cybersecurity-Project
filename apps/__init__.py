@@ -25,24 +25,32 @@ def register_blueprints(app):
 from apps.authentication.oauth import github_blueprint, google_blueprint
 
 def create_app(config):
-
     # Contextual
     static_prefix = '/static'
     templates_dir = os.path.dirname(config.BASE_DIR)
 
-    TEMPLATES_FOLDER = os.path.join(templates_dir,'templates')
-    STATIC_FOLDER = os.path.join(templates_dir,'static')
+    TEMPLATES_FOLDER = os.path.join(templates_dir, 'templates')
+    STATIC_FOLDER = os.path.join(templates_dir, 'static')
 
     print(' > TEMPLATES_FOLDER: ' + TEMPLATES_FOLDER)
     print(' > STATIC_FOLDER:    ' + STATIC_FOLDER)
 
-    app = Flask(__name__, static_url_path=static_prefix, template_folder=TEMPLATES_FOLDER, static_folder=STATIC_FOLDER)
+    app = Flask(
+        __name__,
+        static_url_path=static_prefix,
+        template_folder=TEMPLATES_FOLDER,
+        static_folder=STATIC_FOLDER
+    )
 
     app.config.from_object(config)
 
-
+    # API routes
     from apps.api.routes import api as api_blueprint
     app.register_blueprint(api_blueprint)
+
+    # Threat Intelligence routes
+    from apps.api.threat_intel import ti
+    app.register_blueprint(ti)
 
     register_extensions(app)
     register_blueprints(app)
@@ -50,5 +58,4 @@ def create_app(config):
     app.register_blueprint(google_blueprint, url_prefix="/login")
 
     return app
-
 
