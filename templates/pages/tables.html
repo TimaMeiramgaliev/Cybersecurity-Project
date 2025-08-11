@@ -1,433 +1,367 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Tables {% endblock title %}
+{% block title %} File Management {% endblock title %}
 
 {% block content %}
 
-    <div class="container-fluid py-2">
-      <div class="row">
-        <div class="col-12">
-          <div class="card my-4">
-            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-              <div class="bg-gradient-dark shadow-dark border-radius-lg pt-4 pb-3">
-                <h6 class="text-white text-capitalize ps-3">Authors table</h6>
-              </div>
-            </div>
-            <div class="card-body px-0 pb-2">
-              <div class="table-responsive p-0">
-                <table class="table align-items-center mb-0">
-                  <thead>
-                    <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Author</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Function</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Employed</th>
-                      <th class="text-secondary opacity-7"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div>
-                            <img src="{{ url_for('static', filename='assets/img/team-2.jpg') }}" class="avatar avatar-sm me-3 border-radius-lg" alt="user1">
-                          </div>
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">John Michael</h6>
-                            <p class="text-xs text-secondary mb-0">john@creative-tim.com</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <p class="text-xs font-weight-bold mb-0">Manager</p>
-                        <p class="text-xs text-secondary mb-0">Organization</p>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="badge badge-sm bg-gradient-success">Online</span>
-                      </td>
-                      <td class="align-middle text-center">
-                        <span class="text-secondary text-xs font-weight-bold">23/04/18</span>
-                      </td>
-                      <td class="align-middle">
-                        <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
-                          Edit
-                        </a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div>
-                            <img src="{{ url_for('static', filename='assets/img/team-3.jpg') }}" class="avatar avatar-sm me-3 border-radius-lg" alt="user2">
-                          </div>
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">Alexa Liras</h6>
-                            <p class="text-xs text-secondary mb-0">alexa@creative-tim.com</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <p class="text-xs font-weight-bold mb-0">Programator</p>
-                        <p class="text-xs text-secondary mb-0">Developer</p>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="badge badge-sm bg-gradient-secondary">Offline</span>
-                      </td>
-                      <td class="align-middle text-center">
-                        <span class="text-secondary text-xs font-weight-bold">11/01/19</span>
-                      </td>
-                      <td class="align-middle">
-                        <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
-                          Edit
-                        </a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div>
-                            <img src="{{ url_for('static', filename='assets/img/team-4.jpg') }}" class="avatar avatar-sm me-3 border-radius-lg" alt="user3">
-                          </div>
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">Laurent Perrier</h6>
-                            <p class="text-xs text-secondary mb-0">laurent@creative-tim.com</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <p class="text-xs font-weight-bold mb-0">Executive</p>
-                        <p class="text-xs text-secondary mb-0">Projects</p>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="badge badge-sm bg-gradient-success">Online</span>
-                      </td>
-                      <td class="align-middle text-center">
-                        <span class="text-secondary text-xs font-weight-bold">19/09/17</span>
-                      </td>
-                      <td class="align-middle">
-                        <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
-                          Edit
-                        </a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div>
-                            <img src="{{ url_for('static', filename='assets/img/team-3.jpg') }}" class="avatar avatar-sm me-3 border-radius-lg" alt="user4">
-                          </div>
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">Michael Levi</h6>
-                            <p class="text-xs text-secondary mb-0">michael@creative-tim.com</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <p class="text-xs font-weight-bold mb-0">Programator</p>
-                        <p class="text-xs text-secondary mb-0">Developer</p>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="badge badge-sm bg-gradient-success">Online</span>
-                      </td>
-                      <td class="align-middle text-center">
-                        <span class="text-secondary text-xs font-weight-bold">24/12/08</span>
-                      </td>
-                      <td class="align-middle">
-                        <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
-                          Edit
-                        </a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div>
-                            <img src="{{ url_for('static', filename='assets/img/team-2.jpg') }}" class="avatar avatar-sm me-3 border-radius-lg" alt="user5">
-                          </div>
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">Richard Gran</h6>
-                            <p class="text-xs text-secondary mb-0">richard@creative-tim.com</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <p class="text-xs font-weight-bold mb-0">Manager</p>
-                        <p class="text-xs text-secondary mb-0">Executive</p>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="badge badge-sm bg-gradient-secondary">Offline</span>
-                      </td>
-                      <td class="align-middle text-center">
-                        <span class="text-secondary text-xs font-weight-bold">04/10/21</span>
-                      </td>
-                      <td class="align-middle">
-                        <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
-                          Edit
-                        </a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div>
-                            <img src="{{ url_for('static', filename='assets/img/team-4.jpg') }}" class="avatar avatar-sm me-3 border-radius-lg" alt="user6">
-                          </div>
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">Miriam Eric</h6>
-                            <p class="text-xs text-secondary mb-0">miriam@creative-tim.com</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <p class="text-xs font-weight-bold mb-0">Programator</p>
-                        <p class="text-xs text-secondary mb-0">Developer</p>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="badge badge-sm bg-gradient-secondary">Offline</span>
-                      </td>
-                      <td class="align-middle text-center">
-                        <span class="text-secondary text-xs font-weight-bold">14/09/20</span>
-                      </td>
-                      <td class="align-middle">
-                        <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
-                          Edit
-                        </a>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+<div class="container-fluid py-4">
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex align-items-center">
+        <div class="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-lg me-3">
+          <i class="material-symbols-rounded opacity-10">folder</i>
+        </div>
+        <div>
+          <h3 class="mb-0 h4 font-weight-bolder">File Management</h3>
+          <p class="mb-0 text-sm text-secondary">Monitor and manage transferred files from agents</p>
         </div>
       </div>
-      <div class="row">
-        <div class="col-12">
-          <div class="card my-4">
-            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-              <div class="bg-gradient-dark shadow-dark border-radius-lg pt-4 pb-3">
-                <h6 class="text-white text-capitalize ps-3">Projects table</h6>
-              </div>
-            </div>
-            <div class="card-body px-0 pb-2">
-              <div class="table-responsive p-0">
-                <table class="table align-items-center justify-content-center mb-0">
-                  <thead>
-                    <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Project</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Budget</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder text-center opacity-7 ps-2">Completion</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2">
-                          <div>
-                            <img src="{{ url_for('static', filename='assets/img/small-logos/logo-asana.svg') }}" class="avatar avatar-sm rounded-circle me-2" alt="spotify">
-                          </div>
-                          <div class="my-auto">
-                            <h6 class="mb-0 text-sm">Asana</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <p class="text-sm font-weight-bold mb-0">$2,500</p>
-                      </td>
-                      <td>
-                        <span class="text-xs font-weight-bold">working</span>
-                      </td>
-                      <td class="align-middle text-center">
-                        <div class="d-flex align-items-center justify-content-center">
-                          <span class="me-2 text-xs font-weight-bold">60%</span>
-                          <div>
-                            <div class="progress">
-                              <div class="progress-bar bg-gradient-info" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="align-middle">
-                        <button class="btn btn-link text-secondary mb-0">
-                          <i class="fa fa-ellipsis-v text-xs"></i>
-                        </button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2">
-                          <div>
-                            <img src="{{ url_for('static', filename='assets/img/small-logos/github.svg') }}" class="avatar avatar-sm rounded-circle me-2" alt="invision">
-                          </div>
-                          <div class="my-auto">
-                            <h6 class="mb-0 text-sm">Github</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <p class="text-sm font-weight-bold mb-0">$5,000</p>
-                      </td>
-                      <td>
-                        <span class="text-xs font-weight-bold">done</span>
-                      </td>
-                      <td class="align-middle text-center">
-                        <div class="d-flex align-items-center justify-content-center">
-                          <span class="me-2 text-xs font-weight-bold">100%</span>
-                          <div>
-                            <div class="progress">
-                              <div class="progress-bar bg-gradient-success" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;"></div>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="align-middle">
-                        <button class="btn btn-link text-secondary mb-0" aria-haspopup="true" aria-expanded="false">
-                          <i class="fa fa-ellipsis-v text-xs"></i>
-                        </button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2">
-                          <div>
-                            <img src="{{ url_for('static', filename='assets/img/small-logos/logo-atlassian.svg') }}" class="avatar avatar-sm rounded-circle me-2" alt="jira">
-                          </div>
-                          <div class="my-auto">
-                            <h6 class="mb-0 text-sm">Atlassian</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <p class="text-sm font-weight-bold mb-0">$3,400</p>
-                      </td>
-                      <td>
-                        <span class="text-xs font-weight-bold">canceled</span>
-                      </td>
-                      <td class="align-middle text-center">
-                        <div class="d-flex align-items-center justify-content-center">
-                          <span class="me-2 text-xs font-weight-bold">30%</span>
-                          <div>
-                            <div class="progress">
-                              <div class="progress-bar bg-gradient-danger" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="30" style="width: 30%;"></div>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="align-middle">
-                        <button class="btn btn-link text-secondary mb-0" aria-haspopup="true" aria-expanded="false">
-                          <i class="fa fa-ellipsis-v text-xs"></i>
-                        </button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2">
-                          <div>
-                            <img src="{{ url_for('static', filename='assets/img/small-logos/bootstrap.svg') }}" class="avatar avatar-sm rounded-circle me-2" alt="webdev">
-                          </div>
-                          <div class="my-auto">
-                            <h6 class="mb-0 text-sm">Bootstrap</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <p class="text-sm font-weight-bold mb-0">$14,000</p>
-                      </td>
-                      <td>
-                        <span class="text-xs font-weight-bold">working</span>
-                      </td>
-                      <td class="align-middle text-center">
-                        <div class="d-flex align-items-center justify-content-center">
-                          <span class="me-2 text-xs font-weight-bold">80%</span>
-                          <div>
-                            <div class="progress">
-                              <div class="progress-bar bg-gradient-info" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="80" style="width: 80%;"></div>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="align-middle">
-                        <button class="btn btn-link text-secondary mb-0" aria-haspopup="true" aria-expanded="false">
-                          <i class="fa fa-ellipsis-v text-xs"></i>
-                        </button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2">
-                          <div>
-                            <img src="{{ url_for('static', filename='assets/img/small-logos/logo-slack.svg') }}" class="avatar avatar-sm rounded-circle me-2" alt="slack">
-                          </div>
-                          <div class="my-auto">
-                            <h6 class="mb-0 text-sm">Slack</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <p class="text-sm font-weight-bold mb-0">$1,000</p>
-                      </td>
-                      <td>
-                        <span class="text-xs font-weight-bold">canceled</span>
-                      </td>
-                      <td class="align-middle text-center">
-                        <div class="d-flex align-items-center justify-content-center">
-                          <span class="me-2 text-xs font-weight-bold">0%</span>
-                          <div>
-                            <div class="progress">
-                              <div class="progress-bar bg-gradient-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="width: 0%;"></div>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="align-middle">
-                        <button class="btn btn-link text-secondary mb-0" aria-haspopup="true" aria-expanded="false">
-                          <i class="fa fa-ellipsis-v text-xs"></i>
-                        </button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2">
-                          <div>
-                            <img src="{{ url_for('static', filename='assets/img/small-logos/devto.svg') }}" class="avatar avatar-sm rounded-circle me-2" alt="xd">
-                          </div>
-                          <div class="my-auto">
-                            <h6 class="mb-0 text-sm">Devto</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <p class="text-sm font-weight-bold mb-0">$2,300</p>
-                      </td>
-                      <td>
-                        <span class="text-xs font-weight-bold">done</span>
-                      </td>
-                      <td class="align-middle text-center">
-                        <div class="d-flex align-items-center justify-content-center">
-                          <span class="me-2 text-xs font-weight-bold">100%</span>
-                          <div>
-                            <div class="progress">
-                              <div class="progress-bar bg-gradient-success" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;"></div>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="align-middle">
-                        <button class="btn btn-link text-secondary mb-0" aria-haspopup="true" aria-expanded="false">
-                          <i class="fa fa-ellipsis-v text-xs"></i>
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      {% include "includes/footer.html" %}
     </div>
-  
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row mb-4">
+    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+      <div class="card">
+        <div class="card-header p-3">
+          <div class="d-flex justify-content-between">
+            <div>
+              <p class="text-sm mb-0 text-capitalize">Total Files</p>
+              <h4 class="mb-0" id="total-files">-</h4>
+            </div>
+            <div class="icon icon-md icon-shape bg-gradient-info shadow-info shadow text-center border-radius-lg">
+              <i class="material-symbols-rounded opacity-10">description</i>
+            </div>
+          </div>
+        </div>
+        <hr class="dark horizontal my-0">
+        <div class="card-footer p-3">
+          <p class="mb-0 text-sm"><span class="font-weight-bolder">Auto-refresh</span> every 15s</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+      <div class="card">
+        <div class="card-header p-3">
+          <div class="d-flex justify-content-between">
+            <div>
+              <p class="text-sm mb-0 text-capitalize">Total Size</p>
+              <h4 class="mb-0" id="total-size">-</h4>
+            </div>
+            <div class="icon icon-md icon-shape bg-gradient-success shadow-success shadow text-center border-radius-lg">
+              <i class="material-symbols-rounded opacity-10">storage</i>
+            </div>
+          </div>
+        </div>
+        <hr class="dark horizontal my-0">
+        <div class="card-footer p-3">
+          <p class="mb-0 text-sm"><span class="font-weight-bolder">Compressed</span> storage</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+      <div class="card">
+        <div class="card-header p-3">
+          <div class="d-flex justify-content-between">
+            <div>
+              <p class="text-sm mb-0 text-capitalize">Active Agents</p>
+              <h4 class="mb-0" id="active-agents">-</h4>
+            </div>
+            <div class="icon icon-md icon-shape bg-gradient-warning shadow-warning shadow text-center border-radius-lg">
+              <i class="material-symbols-rounded opacity-10">computer</i>
+            </div>
+          </div>
+        </div>
+        <hr class="dark horizontal my-0">
+        <div class="card-footer p-3">
+          <p class="mb-0 text-sm"><span class="font-weight-bolder">Connected</span> devices</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+      <div class="card">
+        <div class="card-header p-3">
+          <div class="d-flex justify-content-between">
+            <div>
+              <p class="text-sm mb-0 text-capitalize">Last Update</p>
+              <h4 class="mb-0" id="last-update">-</h4>
+            </div>
+            <div class="icon icon-md icon-shape bg-gradient-dark shadow-dark shadow text-center border-radius-lg">
+              <i class="material-symbols-rounded opacity-10">schedule</i>
+            </div>
+          </div>
+        </div>
+        <hr class="dark horizontal my-0">
+        <div class="card-footer p-3">
+          <p class="mb-0 text-sm"><span class="font-weight-bolder">Real-time</span> monitoring</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Files Table Card -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card my-4">
+        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+          <div class="bg-gradient-dark shadow-dark border-radius-lg pt-4 pb-3">
+            <div class="d-flex justify-content-between align-items-center px-3">
+              <h6 class="text-white text-capitalize mb-0">
+                <i class="material-symbols-rounded me-2">cloud_download</i>
+                Transferred Files
+              </h6>
+              <div class="d-flex align-items-center">
+                <button class="btn btn-sm btn-outline-light me-2" onclick="loadFiles()">
+                  <i class="material-symbols-rounded me-1">refresh</i>
+                  Refresh
+                </button>
+                <span class="badge bg-white text-dark" id="file-count">0 files</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body px-0 pb-2">
+          <div class="table-responsive p-0">
+            <table class="table align-items-center justify-content-center mb-0" id="files-table">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-3">
+                    <i class="material-symbols-rounded me-1">computer</i>
+                    Agent ID
+                  </th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                    <i class="material-symbols-rounded me-1">description</i>
+                    File Name
+                  </th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                    <i class="material-symbols-rounded me-1">storage</i>
+                    Size
+                  </th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                    <i class="material-symbols-rounded me-1">schedule</i>
+                    Received (UTC)
+                  </th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                    <i class="material-symbols-rounded me-1">settings</i>
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="files-tbody">
+                <!-- Loading state -->
+                <tr>
+                  <td colspan="5" class="text-center py-4">
+                    <div class="d-flex justify-content-center align-items-center">
+                      <div class="spinner-border text-primary me-2" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                      </div>
+                      <span class="text-secondary">Loading files...</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State (hidden by default) -->
+  <div class="row" id="empty-state" style="display: none;">
+    <div class="col-12 text-center py-5">
+      <div class="icon icon-lg icon-shape bg-gradient-light shadow-light text-center border-radius-lg mx-auto mb-3" style="width: 80px; height: 80px;">
+        <i class="material-symbols-rounded opacity-10 text-secondary" style="font-size: 2rem;">folder_open</i>
+      </div>
+      <h5 class="text-secondary mb-2">No files available</h5>
+      <p class="text-secondary mb-0">Files will appear here once agents start transferring data</p>
+    </div>
+  </div>
+</div>
+
+<script>
+function formatSize(bytes) {
+  if (bytes == null) return "-";
+  const units = ["B", "KB", "MB", "GB", "TB"];
+  let i = 0, val = bytes;
+  while (val >= 1024 && i < units.length - 1) {
+    val /= 1024;
+    i++;
+  }
+  return (i === 0 ? val : val.toFixed(1)) + " " + units[i];
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "-";
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      timeZone: 'UTC'
+    });
+  } catch (e) {
+    return dateString;
+  }
+}
+
+function updateStats(files) {
+  // Update total files count
+  document.getElementById('total-files').textContent = files.length;
+  document.getElementById('file-count').textContent = `${files.length} file${files.length !== 1 ? 's' : ''}`;
+
+  // Update total size
+  const totalSize = files.reduce((sum, file) => sum + (file.size || 0), 0);
+  document.getElementById('total-size').textContent = formatSize(totalSize);
+
+  // Update active agents count
+  const uniqueAgents = new Set(files.map(f => f.agent_id)).size;
+  document.getElementById('active-agents').textContent = uniqueAgents;
+
+  // Update last update time
+  const now = new Date();
+  document.getElementById('last-update').textContent = now.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+}
+
+async function loadFiles() {
+  try {
+    const resp = await fetch('/api/files');
+    const data = await resp.json();
+    const rows = (data.files || []);
+    const tbody = document.getElementById('files-tbody');
+    const emptyState = document.getElementById('empty-state');
+
+    // Update stats
+    updateStats(rows);
+
+    // Show/hide empty state
+    if (!rows.length) {
+      tbody.innerHTML = '';
+      emptyState.style.display = 'block';
+      return;
+    } else {
+      emptyState.style.display = 'none';
+    }
+
+    // Clear and rebuild table
+    tbody.innerHTML = '';
+
+    rows.forEach((item, index) => {
+      const tr = document.createElement('tr');
+      tr.className = index % 2 === 0 ? '' : 'table-striped';
+
+      // Agent ID with icon
+      const tdAgent = document.createElement('td');
+      tdAgent.className = 'ps-3';
+      tdAgent.innerHTML = `
+        <div class="d-flex align-items-center">
+          <div class="icon icon-sm icon-shape bg-gradient-secondary shadow-secondary text-center border-radius-lg me-2">
+            <i class="material-symbols-rounded opacity-10 text-white" style="font-size: 0.875rem;">computer</i>
+          </div>
+          <span class="text-sm font-weight-bold">${item.agent_id}</span>
+        </div>
+      `;
+
+      // File name with icon
+      const tdName = document.createElement('td');
+      tdName.innerHTML = `
+        <div class="d-flex align-items-center">
+          <div class="icon icon-sm icon-shape bg-gradient-info shadow-info text-center border-radius-lg me-2">
+            <i class="material-symbols-rounded opacity-10 text-white" style="font-size: 0.875rem;">description</i>
+          </div>
+          <span class="text-sm font-weight-bold">${item.filename}</span>
+        </div>
+      `;
+
+      // File size
+      const tdSize = document.createElement('td');
+      tdSize.innerHTML = `
+        <span class="badge badge-sm bg-gradient-success">${formatSize(item.size)}</span>
+      `;
+
+      // Timestamp
+      const tdTs = document.createElement('td');
+      tdTs.innerHTML = `
+        <span class="text-sm text-secondary">${formatDate(item.received_at)}</span>
+      `;
+
+      // Actions
+      const tdAct = document.createElement('td');
+      tdAct.innerHTML = `
+        <div class="d-flex gap-2">
+          <a class="btn btn-sm btn-outline-primary" href="${item.download_url}" title="Download file">
+            <i class="material-symbols-rounded me-1" style="font-size: 0.875rem;">download</i>
+            Download
+          </a>
+          <button class="btn btn-sm btn-outline-info" onclick="showFileInfo('${item.filename}', '${item.agent_id}', '${formatSize(item.size)}', '${formatDate(item.received_at)}')" title="File information">
+            <i class="material-symbols-rounded" style="font-size: 0.875rem;">info</i>
+          </button>
+        </div>
+      `;
+
+      tr.appendChild(tdAgent);
+      tr.appendChild(tdName);
+      tr.appendChild(tdSize);
+      tr.appendChild(tdTs);
+      tr.appendChild(tdAct);
+
+      tbody.appendChild(tr);
+    });
+
+  } catch (e) {
+    console.error('Error loading files:', e);
+    const tbody = document.getElementById('files-tbody');
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" class="text-center py-4">
+          <div class="alert alert-danger" role="alert">
+            <i class="material-symbols-rounded me-2">error</i>
+            Error loading files. Please try again.
+          </div>
+        </td>
+      </tr>
+    `;
+  }
+}
+
+function showFileInfo(filename, agentId, size, date) {
+  // Create a simple modal-like display
+  const info = `File: ${filename}\nAgent: ${agentId}\nSize: ${size}\nReceived: ${date}`;
+  alert(info); // In a real app, you'd use a proper modal
+}
+
+// Initial load and auto-refresh every 15 seconds
+loadFiles();
+setInterval(loadFiles, 15000);
+
+// Add some visual feedback for refresh button
+document.addEventListener('DOMContentLoaded', function() {
+  const refreshBtn = document.querySelector('button[onclick="loadFiles()"]');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', function() {
+      this.innerHTML = '<i class="material-symbols-rounded me-1">refresh</i> Refreshing...';
+      this.disabled = true;
+      setTimeout(() => {
+        this.innerHTML = '<i class="material-symbols-rounded me-1">refresh</i> Refresh';
+        this.disabled = false;
+      }, 1000);
+    });
+  }
+});
+</script>
+
 {% endblock content %}
+

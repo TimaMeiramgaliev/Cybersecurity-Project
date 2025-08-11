@@ -49,7 +49,7 @@ def emailValidate(email):
     else:
         return False
 
-# santise file name
+
 def sanitise_fille_name(value):
     """ remove special char  """
     return value.strip().lower().replace(' ', '_').replace('(', '').replace(')', '').replace(',', '').replace('=','_').replace('-', '_').replace('#', '')

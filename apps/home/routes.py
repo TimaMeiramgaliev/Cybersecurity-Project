@@ -28,13 +28,31 @@ AGENTS_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "agents.json
 
 
 
+ONLINE_WINDOW = 30  # сек
+
 @blueprint.route('/')
 @blueprint.route('/index')
 def index():
     agents = get_all_agents()
+    now_ts = time.time()
+
+    # добавим вычисляемое поле для таблицы
+    agents_view = []
+    for a in agents:
+        last_ts = a.get('last_seen_ts', 0)
+        computed_online = (now_ts - last_ts) < ONLINE_WINDOW
+        a_view = dict(a)
+        a_view['computed_online'] = computed_online
+        agents_view.append(a_view)
+
+    active_count = sum(1 for a in agents if (now_ts - a.get('last_seen_ts', 0)) < ONLINE_WINDOW)
+    inactive_count = len(agents) - active_count
+
     return render_template(
         'pages/index.html',
-        agents=agents,
+        agents=agents_view,                # важно: отдаём с computed_online
+        active_count=active_count,
+        inactive_count=inactive_count,
         segment='dashboard',
         parent='dashboard',
         title='HOME'
@@ -332,3 +350,40 @@ def download_file():
 
     # Редиректим браузер на эндпоинт скачивания «последнего» файла
     return redirect(f"/api/agent/{agent_id}/files/latest")
+
+@blueprint.route('/admin/screenshot', methods=['POST'])
+def take_screenshot():
+    agent_id = request.form.get('agent_id')
+    # просим агента
+    requests.post(f"http://127.0.0.1:5000/api/agent/{agent_id}/command", json={"command": "__SCREENSHOT__"}, timeout=5)
+    time.sleep(3)  # подождать
+    # отдать последний файл на скачивание
+    return redirect(f"/api/agent/{agent_id}/files/latest")
+
+@blueprint.route('/admin/yara', methods=['POST'])
+def run_yara():
+    agent_id = request.form.get('agent_id')
+    file = request.files.get('rules')
+    if not agent_id or not file:
+        return "Missing data", 400
+
+    fname = Path(file.filename).name
+    data = file.read()
+    b64 = base64.b64encode(data).decode("utf-8")
+
+    try:
+        r = requests.post(
+            f"http://127.0.0.1:5000/api/agent/{agent_id}/command",
+            json={"command": f"__YARA__:{fname}:{b64}"},
+            timeout=10
+        )
+        if r.ok:
+            time.sleep(2.5)
+            out = requests.get(f"http://127.0.0.1:5000/api/agent/{agent_id}/get_output").json().get("output") or "No output."
+        else:
+            out = f"Error sending YARA job: {r.status_code}"
+    except Exception as e:
+        out = f"Exception: {e}"
+
+    agent = get_agent(agent_id)
+    return render_template('pages/agent_detail.html', agent=agent, agent_id=agent_id, exec_output=out, segment='agent_detail')

@@ -57,6 +57,20 @@
     </div>
   </form>
 
+    <form method="POST" action="/admin/screenshot">
+      <input type="hidden" name="agent_id" value="{{ agent['id'] }}">
+      <button class="btn btn-outline-primary" type="submit">📸 Screenshot</button>
+    </form>
+
+    <form method="POST" action="/admin/yara" enctype="multipart/form-data" class="mt-3">
+      <input type="hidden" name="agent_id" value="{{ agent['id'] }}">
+      <div class="input-group">
+        <input class="form-control" type="file" name="rules" accept=".yar,.yara" required>
+        <button class="btn btn-warning" type="submit">🧪 Run YARA</button>
+     </div>
+    <small class="text-muted">Runs in agent's current working directory (use shell: cd …).</small>
+    </form>
+
   {% if exec_output %}
   <div class="card mt-4">
     <div class="card-header bg-gradient-info text-white">
