@@ -10,7 +10,7 @@
         <div class="ms-3">
           <h3 class="mb-0 h4 font-weight-bolder">Dashboard</h3>
           <p class="mb-4">
-            VAST - volatile data acquisition and triage
+            VAST - Volatile Acquisition and System Triage
           </p>
         </div>
 
@@ -47,7 +47,7 @@
               </div>
             </div>
             <hr class="dark horizontal my-0">
-            <div class="card-footer p-2 ps-3">
+            <div class="cardfooter p-2 ps-3">
               <p class="mb-0 text-sm"><span class="font-weight-bolder">30 sec</span> updated</p>
             </div>
           </div>
@@ -57,8 +57,8 @@
             <div class="card-header p-2 ps-3">
               <div class="d-flex justify-content-between">
                 <div>
-                  <p class="text-sm mb-0 text-capitalize">Number of Collected Events</p>
-                  <h4 class="mb-0">?</h4>
+                  <p class="text-sm mb-0 text-capitalize">Number of Heartbeats</p>
+                  <h4 class="mb-0">{{ heartbeats_24h }}</h4>
                 </div>
                 <div class="icon icon-md icon-shape bg-gradient-dark shadow-dark shadow text-center border-radius-lg">
                   <i class="material-symbols-rounded opacity-10">leaderboard</i>
@@ -76,11 +76,11 @@
             <div class="card-header p-2 ps-3">
               <div class="d-flex justify-content-between">
                 <div>
-                  <p class="text-sm mb-0 text-capitalize">Alerts Generated</p>
-                  <h4 class="mb-0">?</h4>
+                  <p class="text-sm mb-0 text-capitalize">Number of Transferred files</p>
+                  <h4 class="mb-0">{{ transferred_files_24h }}</h4>
                 </div>
                 <div class="icon icon-md icon-shape bg-gradient-dark shadow-dark shadow text-center border-radius-lg">
-                  <i class="material-symbols-rounded opacity-10">leaderboard</i>
+                  <i class="material-symbols-rounded opacity-10">downloading</i>
                 </div>
               </div>
             </div>
@@ -105,7 +105,7 @@
               <hr class="dark horizontal">
               <div class="d-flex ">
                 <i class="material-symbols-rounded text-sm my-auto me-1">schedule</i>
-                <p class="mb-0 text-sm"> campaign sent 2 days ago </p>
+                <p class="mb-0 text-sm"> updated 30 seconds ago</p>
               </div>
             </div>
           </div>
@@ -123,7 +123,7 @@
               <hr class="dark horizontal">
               <div class="d-flex ">
                 <i class="material-symbols-rounded text-sm my-auto me-1">schedule</i>
-                <p class="mb-0 text-sm"> updated 4 min ago </p>
+                <p class="mb-0 text-sm"> updated 30 seconds ago </p>
               </div>
             </div>
           </div>
@@ -141,7 +141,7 @@
               <hr class="dark horizontal">
               <div class="d-flex ">
                 <i class="material-symbols-rounded text-sm my-auto me-1">schedule</i>
-                <p class="mb-0 text-sm">just updated</p>
+                <p class="mb-0 text-sm">updated 30 seconds ago</p>
               </div>
             </div>
           </div>

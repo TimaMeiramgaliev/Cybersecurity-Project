@@ -71,6 +71,29 @@
     color: white;
     box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
   }
+
+  /* Search form styling to ensure consistent heights */
+  .search .input-group {
+    align-items: stretch;
+  }
+
+  .search .form-control {
+    height: 38px !important;
+    min-height: 38px !important;
+    line-height: 1.5;
+    padding: 0.375rem 0.75rem;
+  }
+
+  .search .btn {
+    height: 38px !important;
+    min-height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.375rem 0.75rem;
+    line-height: 1.5;
+  }
+
   .btn-custom {
     border-radius: 25px;
     padding: 0.5rem 1.5rem;
@@ -136,6 +159,54 @@
     padding: 0.5rem 1rem;
     font-size: 0.75rem;
     font-weight: 500;
+  }
+
+  /* Form styling for better alignment */
+  .modal-body .form-group {
+    margin-bottom: 0;
+  }
+
+  .modal-body .form-label {
+    margin-bottom: 0.75rem;
+    color: #495057;
+    font-size: 0.875rem;
+    display: block;
+    line-height: 1.2;
+  }
+
+  .modal-body .form-control,
+  .modal-body .form-select {
+    height: 42px;
+    border-radius: 0.5rem;
+    border: 1px solid #dee2e6;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .modal-body .form-control:focus,
+  .modal-body .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    outline: none;
+  }
+
+  .modal-body .row.g-4 {
+    margin: 0;
+  }
+
+  .modal-body .col-md-6 {
+    padding: 1rem;
+  }
+
+  /* Ensure consistent spacing between form elements */
+  .modal-body .form-group + .form-group {
+    margin-top: 0;
+  }
+
+  /* Better alignment for the form */
+  .modal-body form {
+    padding: 0.5rem 0;
   }
 </style>
 {% endblock extrastyle %}
@@ -638,47 +709,48 @@
         <h5 class="modal-title" id="addSalesLabel">
           <i class="fas fa-plus me-2"></i>Add {{ link|title }}
         </h5>
-        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
       </div>
       <div class="modal-body">
         <form method="post" action="{{ url_for('table_blueprint.create', aPath=link) }}">
-          <div class="row">
+          <div class="row g-4">
             <!-- FKs -->
             {% for field, values in fk_fields.items() %}
-            <div class="col-md-6 mb-3">
-              <label for="id_{{ field }}" class="form-label">{{ field|title }}</label>
-              <select class="form-select border rounded-pill" name="{{ field }}" id="id_{{ field }}">
-                {% for i in values %}
-                  <option value="{{ i.id }}">{{ i }}</option>
-                {% endfor %}
-              </select>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="id_{{ field }}" class="form-label fw-bold mb-2">{{ field|title }}</label>
+                <select class="form-select border rounded-pill" name="{{ field }}" id="id_{{ field }}">
+                  {% for i in values %}
+                    <option value="{{ i.id }}">{{ i }}</option>
+                  {% endfor %}
+                </select>
+              </div>
             </div>
             {% endfor %}
 
             {% for field_name in db_field_names %}
               {% if field_name not in read_only_fields and field_name not in fk_fields_keys and field_name not in exclude_auto_gen_fields %}
-              <div class="col-md-6 mb-3">
-                <label for="id_{{ field_name }}" class="form-label">{{ field_name|title }}</label>
-                {% if field_name in choices_dict %}
-                  <select name="{{ field_name }}" id="id_{{ field_name }}" class="form-select border rounded-pill">
-                    <option value="">Select {{ field_name }}</option>
-                    {% for key, value in choices_dict|get(field_name) %}
-                      <option value="{{ key }}">{{ key }}</option>
-                    {% endfor %}
-                  </select>
-                {% else %}
-                  {% if field_name in integer_fields %}
-                  <input type="number" name="{{ field_name }}" class="form-control border rounded-pill" placeholder="{{ field_name|title }}" id="id_{{ field_name }}">
-                  {% elif field_name in date_time_fields %}
-                  <input type="datetime-local" name="{{ field_name }}" class="form-control border rounded-pill" placeholder="{{ field_name|title }}" id="id_{{ field_name }}">
-                  {% elif field_name in email_fields %}
-                  <input type="email" name="{{ field_name }}" class="form-control border rounded-pill" placeholder="{{ field_name|title }}" id="id_{{ field_name }}">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="id_{{ field_name }}" class="form-label fw-bold mb-2">{{ field_name|title }}</label>
+                  {% if field_name in choices_dict %}
+                    <select name="{{ field_name }}" id="id_{{ field_name }}" class="form-select border rounded-pill">
+                      <option value="">Select {{ field_name }}</option>
+                      {% for key, value in choices_dict|get(field_name) %}
+                        <option value="{{ key }}">{{ key }}</option>
+                      {% endfor %}
+                    </select>
                   {% else %}
-                  <input type="text" name="{{ field_name }}" class="form-control border rounded-pill" placeholder="{{ field_name|title }}" id="id_{{ field_name }}">
+                    {% if field_name in integer_fields %}
+                    <input type="number" name="{{ field_name }}" class="form-control border rounded-pill" placeholder="{{ field_name|title }}" id="id_{{ field_name }}">
+                    {% elif field_name in date_time_fields %}
+                    <input type="datetime-local" name="{{ field_name }}" class="form-control border rounded-pill" placeholder="{{ field_name|title }}" id="id_{{ field_name }}">
+                    {% elif field_name in email_fields %}
+                    <input type="email" name="{{ field_name }}" class="form-control border rounded-pill" placeholder="{{ field_name|title }}" id="id_{{ field_name }}">
+                    {% else %}
+                    <input type="text" name="{{ field_name }}" class="form-control border rounded-pill" placeholder="{{ field_name|title }}" id="id_{{ field_name }}">
+                    {% endif %}
                   {% endif %}
-                {% endif %}
+                </div>
               </div>
               {% endif %}
             {% endfor %}

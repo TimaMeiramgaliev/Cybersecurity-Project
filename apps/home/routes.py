@@ -27,9 +27,8 @@ from apps.api.threat_intel import get_recent_conns
 
 AGENTS_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "agents.json")
 
-
-
 ONLINE_WINDOW = 30  # сек
+
 
 @blueprint.route('/')
 @blueprint.route('/index')
@@ -49,15 +48,34 @@ def index():
     active_count = sum(1 for a in agents if (now_ts - a.get('last_seen_ts', 0)) < ONLINE_WINDOW)
     inactive_count = len(agents) - active_count
 
+    # Calculate heartbeats for last 24 hours
+    from apps.api.routes import heartbeats_log, files_log, metrics_lock
+    from datetime import datetime, timedelta
+
+    heartbeats_24h = 0
+    transferred_files_24h = 0
+    try:
+        now = datetime.utcnow()
+        start = now - timedelta(hours=24)
+        with metrics_lock:
+            heartbeats_24h = sum(1 for ts in heartbeats_log if start <= ts <= now)
+            transferred_files_24h = sum(1 for ts in files_log if start <= ts <= now)
+    except Exception:
+        heartbeats_24h = 0
+        transferred_files_24h = 0
+
     return render_template(
         'pages/index.html',
-        agents=agents_view,                # важно: отдаём с computed_online
+        agents=agents_view,  # важно: отдаём с computed_online
         active_count=active_count,
         inactive_count=inactive_count,
+        heartbeats_24h=heartbeats_24h,  # Add heartbeats count for last 24h
+        transferred_files_24h=transferred_files_24h,  # Add transferred files count for last 24h
         segment='dashboard',
         parent='dashboard',
         title='HOME'
     )
+
 
 @blueprint.route('/agent/<agent_id>')
 def view_agent(agent_id):
@@ -74,14 +92,16 @@ def view_agent(agent_id):
         agent_id=agent_id,
         exec_output=None,
         segment='agent_detail',
-        conns=conns,                # <<< ПЕРЕДАЁМ В ШАБЛОН
+        conns=conns,  # <<< ПЕРЕДАЁМ В ШАБЛОН
     )
+
 
 def load_agents():
     if os.path.exists(AGENTS_FILE):
         with open(AGENTS_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     return []
+
 
 @blueprint.route('/tables')
 def tables():
@@ -90,12 +110,7 @@ def tables():
     }
     return render_template('pages/tables.html', **context)
 
-@blueprint.route('/notifications')
-def notifications():
-    context = {
-        'segment': 'notifications'
-    }
-    return render_template('pages/notifications.html', **context)
+
 
 
 @blueprint.route('/template')
@@ -114,7 +129,7 @@ def landing():
     return render_template('pages/landing.html', **context)
 
 
-def getField(column): 
+def getField(column):
     if isinstance(column.type, db.Text):
         return wtforms.TextAreaField(column.name.title())
     if isinstance(column.type, db.String):
@@ -127,13 +142,12 @@ def getField(column):
         return wtforms.DecimalField(column.name.title())
     if isinstance(column.type, db.LargeBinary):
         return wtforms.HiddenField(column.name.title())
-    return wtforms.StringField(column.name.title()) 
+    return wtforms.StringField(column.name.title())
 
 
 @blueprint.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
-
     class ProfileForm(FlaskForm):
         pass
 
@@ -168,7 +182,7 @@ def profile():
 
         db.session.commit()
         return redirect(url_for('home_blueprint.profile'))
-    
+
     context = {
         'segment': 'profile',
         'form': form,
@@ -178,11 +192,9 @@ def profile():
     return render_template('pages/profile.html', **context)
 
 
-
 @blueprint.route('/<template>')
 @login_required
 def route_template(template):
-
     try:
 
         if not template.endswith('.html'):
@@ -203,7 +215,6 @@ def route_template(template):
 
 # Helper - Extract current page name from request
 def get_segment(request):
-
     try:
 
         segment = request.path.split('/')[-1]
@@ -217,12 +228,12 @@ def get_segment(request):
         return None
 
 
-
 # Custom template filter
 
 @blueprint.app_template_filter("replace_value")
 def replace_value(value, arg):
     return value.replace(arg, " ").title()
+
 
 @blueprint.route('/admin/exec', methods=['POST'])
 def exec_command():
@@ -236,15 +247,16 @@ def exec_command():
         r = requests.post(f"http://127.0.0.1:5000/api/agent/{agent_id}/command", json={"command": command})
         if r.status_code == 200:
             time.sleep(2)  # дождаться выполнения
-            out = requests.get(f"http://127.0.0.1:5000/api/agent/{agent_id}/get_output").json().get("output") or "No output."
+            out = requests.get(f"http://127.0.0.1:5000/api/agent/{agent_id}/get_output").json().get(
+                "output") or "No output."
         else:
             out = f"Error sending command. Status: {r.status_code}"
     except Exception as e:
         out = f"Exception: {e}"
 
     agent = get_agent(agent_id)
-    return render_template('pages/agent_detail.html', agent=agent, agent_id=agent_id, exec_output=out, segment='agent_detail')
-
+    return render_template('pages/agent_detail.html', agent=agent, agent_id=agent_id, exec_output=out,
+                           segment='agent_detail')
 
 
 @blueprint.route('/admin/kill', methods=['POST'])
@@ -290,7 +302,6 @@ def kill_process():
     )
 
 
-
 @blueprint.route('/admin/processes', methods=['POST'])
 def list_processes():
     agent_id = request.form.get('agent_id')
@@ -299,15 +310,16 @@ def list_processes():
         r = requests.post(f"http://127.0.0.1:5000/api/agent/{agent_id}/command", json={"command": cmd})
         if r.status_code == 200:
             time.sleep(2)
-            out = requests.get(f"http://127.0.0.1:5000/api/agent/{agent_id}/get_output").json().get("output") or "No output."
+            out = requests.get(f"http://127.0.0.1:5000/api/agent/{agent_id}/get_output").json().get(
+                "output") or "No output."
         else:
             out = f"Error sending command. Status: {r.status_code}"
     except Exception as e:
         out = f"Exception: {e}"
 
     agent = get_agent(agent_id)
-    return render_template('pages/agent_detail.html', agent=agent, agent_id=agent_id, exec_output=out, segment='agent_detail')
-
+    return render_template('pages/agent_detail.html', agent=agent, agent_id=agent_id, exec_output=out,
+                           segment='agent_detail')
 
 
 @blueprint.route('/admin/list_dir', methods=['POST'])
@@ -323,15 +335,16 @@ def list_directory():
         r = requests.post(f"http://127.0.0.1:5000/api/agent/{agent_id}/command", json={"command": cmd})
         if r.status_code == 200:
             time.sleep(2)
-            out = requests.get(f"http://127.0.0.1:5000/api/agent/{agent_id}/get_output").json().get("output") or "No output."
+            out = requests.get(f"http://127.0.0.1:5000/api/agent/{agent_id}/get_output").json().get(
+                "output") or "No output."
         else:
             out = f"Error sending command. Status: {r.status_code}"
     except Exception as e:
         out = f"Exception: {e}"
 
     agent = get_agent(agent_id)
-    return render_template('pages/agent_detail.html', agent=agent, agent_id=agent_id, exec_output=out, segment='agent_detail')
-
+    return render_template('pages/agent_detail.html', agent=agent, agent_id=agent_id, exec_output=out,
+                           segment='agent_detail')
 
 
 @blueprint.route('/admin/download', methods=['POST'])
@@ -356,6 +369,7 @@ def download_file():
     # Редиректим браузер на эндпоинт скачивания «последнего» файла
     return redirect(f"/api/agent/{agent_id}/files/latest")
 
+
 @blueprint.route('/admin/screenshot', methods=['POST'])
 def take_screenshot():
     agent_id = request.form.get('agent_id')
@@ -365,10 +379,13 @@ def take_screenshot():
     # отдать последний файл на скачивание
     return redirect(f"/api/agent/{agent_id}/files/latest")
 
+
 @blueprint.route('/admin/yara', methods=['POST'])
 def run_yara():
     agent_id = request.form.get('agent_id')
     file = request.files.get('rules')
+    scan_path = request.form.get('scan_path', '.').strip()
+
     if not agent_id or not file:
         return "Missing data", 400
 
@@ -377,18 +394,23 @@ def run_yara():
     b64 = base64.b64encode(data).decode("utf-8")
 
     try:
+        # Encode scan_path to avoid delimiter conflicts
+        scan_path_encoded = base64.b64encode(scan_path.encode()).decode()
+        # Include scan_path in the YARA command
         r = requests.post(
             f"http://127.0.0.1:5000/api/agent/{agent_id}/command",
-            json={"command": f"__YARA__:{fname}:{b64}"},
+            json={"command": f"__YARA__:{fname}:{b64}:{scan_path_encoded}"},
             timeout=10
         )
         if r.ok:
             time.sleep(2.5)
-            out = requests.get(f"http://127.0.0.1:5000/api/agent/{agent_id}/get_output").json().get("output") or "No output."
+            out = requests.get(f"http://127.0.0.1:5000/api/agent/{agent_id}/get_output").json().get(
+                "output") or "No output."
         else:
             out = f"Error sending YARA job: {r.status_code}"
     except Exception as e:
         out = f"Exception: {e}"
 
     agent = get_agent(agent_id)
-    return render_template('pages/agent_detail.html', agent=agent, agent_id=agent_id, exec_output=out, segment='agent_detail')
+    return render_template('pages/agent_detail.html', agent=agent, agent_id=agent_id, exec_output=out,
+                           segment='agent_detail')

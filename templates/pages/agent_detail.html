@@ -345,9 +345,23 @@
               Upload a .yar or .yara file containing your scanning rules
             </div>
           </div>
+          <div class="mb-3">
+            <label for="scan_path" class="form-label fw-bold">Directory to Scan</label>
+            <input type="text" class="form-control" name="scan_path" id="scan_path" placeholder="C:\Users\Agent\Downloads" value=".">
+            <div class="form-text">
+              <i class="fas fa-info-circle me-1"></i>
+              Enter the directory path to scan. Use "." for current directory.
+            </div>
+          </div>
           <div class="alert alert-info">
             <i class="fas fa-lightbulb me-2"></i>
-            <strong>Tip:</strong> The scan will run in the agent's current working directory. Use shell commands like <code>cd</code> to navigate to specific directories.
+            <strong>Examples:</strong>
+            <ul class="mb-0 mt-2">
+              <li><code>.</code> - Current directory (quick scan)</li>
+              <li><code>C:\Users\Agent\Downloads</code> - Specific directory</li>
+              <li><code>C:\</code> - Full C: drive (may take 30+ minutes)</li>
+              <li><code>/home/agent/documents</code> - Linux/Mac path</li>
+            </ul>
           </div>
         </div>
         <div class="modal-footer">
@@ -399,4 +413,6 @@
     </div>
   </div>
 </div>
+
+
 {% endblock %}
