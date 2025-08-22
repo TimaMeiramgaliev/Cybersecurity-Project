@@ -96,8 +96,9 @@ docker run -p 5000:5000 cybersecurity-platform
 ### Agent Deployment
 1. Copy `agent.py` to target systems
 2. Configure server endpoint in agent configuration
-3. Run agent with appropriate permissions
-4. Monitor agent status in dashboard
+3. Install requirements
+4. Run agent with appropriate permissions
+5. Monitor agent status in dashboard
 
 ### API Endpoints
 - `GET /api/agent/<id>` - Agent status and information
