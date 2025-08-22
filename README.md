@@ -1,4 +1,3 @@
-а как тебе этот вариант
 # Cybersecurity Threat Intelligence & Monitoring Platform
 
 A comprehensive cybersecurity platform that provides real-time threat monitoring, agent-based system surveillance, and threat intelligence capabilities. Built with Flask and featuring a modern Material Dashboard interface.
